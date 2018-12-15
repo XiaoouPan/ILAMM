@@ -1,46 +1,16 @@
----
-output: github_document
-
-references:
-- id: ilamm
-  title: 'I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error.' 
-  author:
-  - family: Fan
-    given: J.
-  - family: Liu
-    given: H.
-  - family: Sun
-    given: Q.
-  - family: Zhang
-    given: T.
-  container-title: Annals of Statistics
-  URL: 'https://projecteuclid.org/euclid.aos/1522742437'
-  issued: 46 814–841
-    year: 2018
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, echo = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
-)
-```
-
 # ILAMM
 
 Non-convex Regularized Robust Regression with I-LAMM Algorithm
 
 ## Goal of the package
 
-The package implemented I-LAMM algorithm in C++ on non-convex regularized robust regression with penalties Lasso, smoothly clipped absolute deviation (SCAD) and minimax concave penalty (MCP). Tuning parameters $\lambda$ and $\tau$ (for Huber loss) can be determined by cross validation. As a by-product, the package can also run least squares counterparts (i.e., Lasso, SCAD and MCP). See the papers on this method, [@ilamm], for more details. 
+The package implemented I-LAMM algorithm in C++ on non-convex regularized robust regression with penalties Lasso, smoothly clipped absolute deviation (SCAD) and minimax concave penalty (MCP). Tuning parameters lambda and tau (for Huber loss) can be determined by cross validation. As a by-product, the package can also run least squares counterparts (i.e., Lasso, SCAD and MCP). See reference papers for more details. 
 
-The observed data $X$ is a $n \times d$ matrix, where both low-dimension ($d \le n$) and high-dimension ($d > n$) are allowed, response $Y$ is a continuous vector with length $n$. It's assumed that $Y$ come from the model $Y = X \beta + \epsilon$, where $\epsilon$ may come from asymmetrix and/or heavy-tailed distributions. 
+The observed data X is a n by d matrix, where both low-dimension (d < n) and high-dimension (d > n) are allowed, response Y is a continuous vector with length n. It's assumed that Y come from the model Y = X * beta + epsilon, where epsilon may come from asymmetrix and/or heavy-tailed distributions. 
 
 ## Installation
 
-Install ILAMM from github with:
+Install ILAMM from github:
 
 ```{r gh-installation, eval = FALSE}
 install.packages("devtools")
@@ -65,7 +35,7 @@ The package `ILAMM` is implemented in `Rcpp`, and the following error messages m
     2. For >= R 3.4.* : download the installer from the here: https://gcc.gnu.org/wiki/GFortranBinaries#MacOS. Then run the installer.
 
 
-##Functions
+## Functions
 
 There are four functions, all of which are implemented by I-LAMM algorithm. 
 
@@ -76,7 +46,7 @@ There are four functions, all of which are implemented by I-LAMM algorithm.
 
 ## Simple examples 
 
-Here we generate high-dimensional data and linear model $Y = X \beta + \epsilon$, where $\beta$ is sparse and $\epsilon$ are from log-normal distribution, so they are asymmetrix and heavy-tailed. 
+Here we generate high-dimensional data and linear model Y = X beta + epsilon, where beta is sparse and epsilon are from log-normal distribution, so they are asymmetrix and heavy-tailed. 
 
 ```{r}
 library(ILAMM)
@@ -88,7 +58,7 @@ beta = c(rep(2, 3), rep(0, d - 3))
 Y = X %*% beta + rlnorm(n, 0, 1.2) - exp(1.2^2 / 2)
 ```
 
-Then we fit five methods on $\{X, Y\}$: Lasso, SCAD, Huber-SCAD, MCP and Huber-MCP, and we can evidently find the advantages of Huber-SCAD and Huber-MCP over theor least square counterparts (SCAD and MCP).
+Then we fit five methods on {X, Y}: Lasso, SCAD, Huber-SCAD, MCP and Huber-MCP, and we can evidently find the advantages of Huber-SCAD and Huber-MCP over theor least square counterparts (SCAD and MCP).
 
 ```{r}
 fitLasso = cvNcvxReg(X, Y, penalty = "Lasso")
@@ -105,4 +75,18 @@ betaHuberMCP = fitHuberMCP$beta
 
 ## Notes 
 
-Function `cvNcvxHuberReg` might be slow, because we'll do a two-dimensional grid search for cross validation to determine the values of $\lambda$ and $\tau$.
+Function `cvNcvxHuberReg` might be slow, because we'll do a two-dimensional grid search for cross validation to determine the values of lambda and tau.
+
+## Reference
+
+Fan, J. and Li, R. (2001). Variable selection via nonconcave penalized likelihood and its oracle properties. J. Amer. Statist. Assoc. 96 1348–1360.
+
+Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841.
+
+Huber, P. J. (1964). Robust estimation of a location parameter. Ann. Math. Statist. 35 73–101.
+
+Sanderson, C. and Curtin, R. (2016). Armadillo: a template-based C++ library for linear algebra. J. Open. Src. Softw. 1 26.
+
+Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. J. R. Stat. Soc. Ser. B. Stat. Methodol. 58 267–288.
+
+Zhang, C.-H. (2010). Nearly unbiased variable selection under minimax concave penalty. Ann. Statist. 38 894–942.
