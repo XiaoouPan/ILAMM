@@ -4,9 +4,9 @@ Nonconvex Regularized Robust Regression via I-LAMM (iterative local adaptive maj
 
 ## Goal of this package
 
-This package employs the I-LAMM algorithm to solve regularized Huber regression. The choice of penalty functions includes the $\ell_1$-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP). Tuning parameters lambda and tau (for Huber loss) can be determined by cross-validation. As a by-product, the package can also run least squares counterparts (i.e., Lasso, SCAD and MCP). See reference papers for more details. 
+This package employs the I-LAMM algorithm to solve regularized Huber regression. The choice of penalty functions includes the l1-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP). Two tuning parameters lambda and tau (for Huber loss) are calibrated by cross-validation. As a by-product, this package also produces regularized least squares estimators, including the Lasso, SCAD and MCP. See the reference papers for more details. 
 
-The observed data X is a n by d matrix, where both low-dimension (d < n) and high-dimension (d > n) are allowed, response Y is a continuous vector with length n. It's assumed that Y come from the model Y = X * beta + epsilon, where epsilon may come from asymmetrix and/or heavy-tailed distributions. 
+The observed data are (Y,X), where Y is an n-dimensional response vector and X is an n by d design matrix. We assume that Y depends on X through a linear model Y = X * beta + epsilon, where epsilon is an n-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The package computes the standard Huber's M-estimator if d < n and the regularized Huber regression estimator if d >= n.
 
 ## Installation
 
@@ -46,7 +46,7 @@ There are four functions, all of which are implemented by I-LAMM algorithm.
 
 ## Simple examples 
 
-Here we generate high-dimensional data and linear model Y = X beta + epsilon, where beta is sparse and epsilon are from log-normal distribution, so they are asymmetrix and heavy-tailed. 
+Here we generate data from a sparse linear model Y = X * beta + epsilon, where beta is sparse and epsilon consists of indepedent coordinates drawn from a log-normal distribution, which is asymmetrix and heavy-tailed. 
 
 ```{r}
 library(ILAMM)
