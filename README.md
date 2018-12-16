@@ -6,7 +6,7 @@ Nonconvex Regularized Robust Regression via I-LAMM (iterative local adaptive maj
 
 This package employs the I-LAMM algorithm to solve regularized Huber regression. The choice of penalty functions includes the l1-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP). Two tuning parameters lambda and tau (for Huber loss) are calibrated by cross-validation. As a by-product, this package also produces regularized least squares estimators, including the Lasso, SCAD and MCP. See the reference papers for more details. 
 
-The observed data are (Y,X), where Y is an n-dimensional response vector and X is an n by d design matrix. We assume that Y depends on X through a linear model Y = X * beta + epsilon, where epsilon is an n-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The package computes the standard Huber's M-estimator if d < n and the regularized Huber regression estimator if d >= n.
+The observed data are (Y, X), where Y is an n-dimensional response vector and X is an n by d design matrix. We assume that Y depends on X through a linear model Y = X * beta + epsilon, where epsilon is an n-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The package computes the standard Huber's M-estimator if d < n and the regularized Huber regression estimator if d >= n.
 
 ## Installation
 
