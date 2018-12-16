@@ -1,10 +1,10 @@
-# ILAMM
+# ILAMM 
 
-Non-convex Regularized Robust Regression with I-LAMM Algorithm
+Nonconvex Regularized Robust Regression via I-LAMM (iterative local adaptive majorize-minimization) Algorithm
 
-## Goal of the package
+## Goal of this package
 
-The package implemented I-LAMM algorithm in C++ on non-convex regularized robust regression with penalties Lasso, smoothly clipped absolute deviation (SCAD) and minimax concave penalty (MCP). Tuning parameters lambda and tau (for Huber loss) can be determined by cross validation. As a by-product, the package can also run least squares counterparts (i.e., Lasso, SCAD and MCP). See reference papers for more details. 
+This package employs the I-LAMM algorithm to solve regularized Huber regression. The choice of penalty functions includes the $\ell_1$-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP). Tuning parameters lambda and tau (for Huber loss) can be determined by cross-validation. As a by-product, the package can also run least squares counterparts (i.e., Lasso, SCAD and MCP). See reference papers for more details. 
 
 The observed data X is a n by d matrix, where both low-dimension (d < n) and high-dimension (d > n) are allowed, response Y is a continuous vector with length n. It's assumed that Y come from the model Y = X * beta + epsilon, where epsilon may come from asymmetrix and/or heavy-tailed distributions. 
 
