@@ -77,6 +77,10 @@ betaHuberMCP = fitHuberMCP$beta
 
 Function `cvNcvxHuberReg` might be slow, because we'll do a two-dimensional grid search for cross validation to determine the values of lambda and tau.
 
+## License
+
+GPL (>= 2)
+
 ## Authors
 
 Xiaoou Pan <xip024@ucsd.edu>, Qiang Sun <qsun@utstat.toronto.edu>, Wen-Xin Zhou <wez243@ucsd.edu>
