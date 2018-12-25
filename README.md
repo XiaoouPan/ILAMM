@@ -14,17 +14,20 @@ Install ILAMM from github:
 
 ```{r gh-installation, eval = FALSE}
 install.packages("devtools")
+library(devtools)
 devtools::install_github("XiaoouPan/ILAMM")
 library(ILAMM)
 ```
 
 ## Getting help
 
-Help on the functions can be accessed by typing "?", followed by function name at the R command prompt. 
+Help on the functions can be accessed by typing '?', followed by function name at the R command prompt. 
+
+For example, '?ncvxHuberReg' will present a detailed documentation with inputs, outputs and examples of the function 'ncvxHuberReg'.
 
 ## Common error messages
 
-The package `ILAMM` is implemented in `Rcpp`, and the following error messages might appear when you first install it:
+The package `ILAMM` is implemented in `Rcpp`, and the following error messages might appear when you first install it (we'll keep updating common error messages):
 
 * Error: "...could not find build tools necessary to build ILAMM": For Windows you need Rtools, for Mac OS X you need to install Command Line Tools for XCode. See (https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites). 
 
@@ -87,6 +90,10 @@ Xiaoou Pan <xip024@ucsd.edu>, Qiang Sun <qsun@utstat.toronto.edu>, Wen-Xin Zhou 
 
 ## Reference
 
+Eddelbuettel, D. and Francois, R. (2011). Rcpp: Seamless R and C++ Integration. J. Stat. Softw. 40(8) 1-18.
+
+Eddelbuettel, D. and Sanderson, C. (2014). RcppArmadillo: Accelerating R with high-performance C++ linear algebra. Computational Statistics and Data Analysis, Volume 71, March 2014, pages 1054-1063.
+
 Fan, J. and Li, R. (2001). Variable selection via nonconcave penalized likelihood and its oracle properties. J. Amer. Statist. Assoc. 96 1348–1360.
 
 Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841.
@@ -94,6 +101,8 @@ Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simu
 Huber, P. J. (1964). Robust estimation of a location parameter. Ann. Math. Statist. 35 73–101.
 
 Sanderson, C. and Curtin, R. (2016). Armadillo: a template-based C++ library for linear algebra. J. Open. Src. Softw. 1 26.
+
+Sun, Q., Zhou, W-X. and Fan, J. (2018) Adaptive Huber Regression, J. Amer. Statist. Assoc, to appear.
 
 Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. J. R. Stat. Soc. Ser. B. Stat. Methodol. 58 267–288.
 
