@@ -21,13 +21,13 @@ library(ILAMM)
 
 ## Getting help
 
-Help on the functions can be accessed by typing '?', followed by function name at the R command prompt. 
+Help on the functions can be accessed by typing `?`, followed by function name at the R command prompt. 
 
-For example, '?ncvxHuberReg' will present a detailed documentation with inputs, outputs and examples of the function 'ncvxHuberReg'.
+For example, `?ncvxHuberReg` will present a detailed documentation with inputs, outputs and examples of the function `ncvxHuberReg`.
 
 ## Common error messages
 
-The package `ILAMM` is implemented in `Rcpp`, and the following error messages might appear when you first install it (we'll keep updating common error messages):
+The package `ILAMM` is implemented in `Rcpp`, and the following error messages might appear when you first install it (we'll keep updating common error messages with feedback from customers):
 
 * Error: "...could not find build tools necessary to build ILAMM": For Windows you need Rtools, for Mac OS X you need to install Command Line Tools for XCode. See (https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites). 
 
