@@ -48,10 +48,10 @@ A list including the following terms will be returned:
 }
 }
 \description{
-The function performs k-fold cross validation for (high-dimensional) regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented by I-LAMM algorithm.
+The function performs k-fold cross validation for (high-dimensional) regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented via I-LAMM algorithm.
 }
 \details{
-The design matrix \eqn{X} can be either high-dimensional or low-dimensional, its number of rows should be the same as the length of \eqn{Y}. The sequence of \eqn{\lambda}'s has a default setting but it can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
+The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. The sequence of \eqn{\lambda}'s has a default setting but it can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
 }
 \examples{
 n = 50

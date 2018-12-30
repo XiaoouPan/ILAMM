@@ -37,9 +37,9 @@ LAMM <- function(X, Y, Lambda, beta, phi, lossType, tau, gamma, interecept) {
     .Call('_ILAMM_LAMM', PACKAGE = 'ILAMM', X, Y, Lambda, beta, phi, lossType, tau, gamma, interecept)
 }
 
-#' The function fits (high-dimensional) regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented by I-LAMM algorithm.
+#' The function fits (high-dimensional) regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented via I-LAMM algorithm.
 #'
-#' The design matrix \eqn{X} can be either high-dimensional or low-dimensional, its number of rows should be the same as the length of \eqn{Y}. Tunning parameter \eqn{\lambda} has a default setting but it can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
+#' The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. Tunning parameter \eqn{\lambda} has a default setting but it can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
 #'
 #' @title Non-convex regularized regression
 #' @param X An \eqn{n} by \eqn{d} design matrix with each row being a sample and each column being a variable, either low-dimensional data (\eqn{d \le n}) or high-dimensional data (\eqn{d > n}) are allowed.
@@ -82,9 +82,9 @@ ncvxReg <- function(X, Y, lambda = -1, penalty = "SCAD", phi0 = 0.001, gamma = 1
     .Call('_ILAMM_ncvxReg', PACKAGE = 'ILAMM', X, Y, lambda, penalty, phi0, gamma, epsilon_c, epsilon_t, iteMax, intercept, itcpIncluded)
 }
 
-#' The function fits (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented by I-LAMM algorithm.
+#' The function fits (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented via I-LAMM algorithm.
 #'
-#' The design matrix \eqn{X} can be either high-dimensional or low-dimensional, its number of rows should be the same as the length of \eqn{Y}. Tunning parameters \eqn{\lambda} and \eqn{\tau} have default settings but they can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
+#' The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. Tunning parameters \eqn{\lambda} and \eqn{\tau} have default settings but they can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
 #'
 #' @title Non-convex regularized Huber regression
 #' @param X An \eqn{n} by \eqn{d} design matrix with each row being a sample and each column being a variable, either low-dimensional data (\eqn{d \le n}) or high-dimensional data (\eqn{d > n}) are allowed.
@@ -141,9 +141,9 @@ tauConst <- function(n) {
     .Call('_ILAMM_tauConst', PACKAGE = 'ILAMM', n)
 }
 
-#' The function performs k-fold cross validation for (high-dimensional) regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented by I-LAMM algorithm.
+#' The function performs k-fold cross validation for (high-dimensional) regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented via I-LAMM algorithm.
 #'
-#' The design matrix \eqn{X} can be either high-dimensional or low-dimensional, its number of rows should be the same as the length of \eqn{Y}. The sequence of \eqn{\lambda}'s has a default setting but it can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
+#' The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. The sequence of \eqn{\lambda}'s has a default setting but it can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
 #'
 #' @title K-fold cross validation for non-convex regularized regression
 #' @param X An \eqn{n} by \eqn{d} design matrix with each row being a sample and each column being a variable, either low-dimensional data (\eqn{d \le n}) or high-dimensional data (\eqn{d > n}) are allowed.
@@ -191,9 +191,9 @@ cvNcvxReg <- function(X, Y, lSeq = NULL, nlambda = 30L, penalty = "SCAD", phi0 =
     .Call('_ILAMM_cvNcvxReg', PACKAGE = 'ILAMM', X, Y, lSeq, nlambda, penalty, phi0, gamma, epsilon_c, epsilon_t, iteMax, nfolds, intercept, itcpIncluded)
 }
 
-#' The function performs k-fold cross validation for (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented by I-LAMM algorithm.
+#' The function performs k-fold cross validation for (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented via I-LAMM algorithm.
 #'
-#' The design matrix \eqn{X} can be either high-dimensional or low-dimensional, its number of rows should be the same as the length of \eqn{Y}. The sequence of \eqn{\lambda}'s and \eqn{\tau}'s have default settings but they can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
+#' The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. The sequence of \eqn{\lambda}'s and \eqn{\tau}'s have default settings but they can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
 #'
 #' @title K-fold cross validation for non-convex regularized Huber regression
 #' @param X An \eqn{n} by \eqn{d} design matrix with each row being a sample and each column being a variable, either low-dimensional data (\eqn{d \le n}) or high-dimensional data (\eqn{d > n}) are allowed.

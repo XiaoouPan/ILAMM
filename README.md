@@ -27,7 +27,7 @@ For example, `?ncvxHuberReg` will present a detailed documentation with inputs, 
 
 ## Common error messages
 
-The package `ILAMM` is implemented in `Rcpp`, and the following error messages might appear when you first install it (we'll keep updating common error messages with feedback from customers):
+The package `ILAMM` is implemented in `Rcpp` and `RcppArmadillo`, so the following error messages might appear when you first install it (we'll keep updating common error messages with feedback from customers):
 
 * Error: "...could not find build tools necessary to build ILAMM": For Windows you need Rtools, for Mac OS X you need to install Command Line Tools for XCode. See (https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites). 
 

@@ -7,7 +7,7 @@ Maintainer: Xiaoou Pan <xip024@ucsd.edu>,
             Qiang Sun <qsun@utstat.toronto.edu>, 
             Wen-Xin Zhou <wez243@ucsd.edu>
 Description: A C++ implementation of I-LAMM algorithm to compute regularized Huber regression. 
-             The choice of penalty functions includes the l1-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP).
+             The choice of penalty functions includes the l1-norm (Lasso), the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP).
              Two tuning parameters lambda (for penalty) and tau (for Huber loss) can be either user-specified or calibrated by k-fold cross-validation. 
              Other options include adding an intercept term into the model and modifying parameters in the I-LAMM algorithm.
 License: GPL-2
