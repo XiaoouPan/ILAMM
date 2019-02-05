@@ -21,7 +21,7 @@ arma::vec cmptLambda(const arma::vec& beta, const double lambda, const std::stri
     rst(0) = 0;
   } else if (penalty == "SCAD") {
     double a = 3.7;
-    for (int i = 1; i < beta.size(); i++) {
+    for (int i = 1; i < (int)beta.size(); i++) {
       double abBeta = std::abs(beta(i));
       if (abBeta <= lambda) {
         rst(i) = lambda;
@@ -31,7 +31,7 @@ arma::vec cmptLambda(const arma::vec& beta, const double lambda, const std::stri
     }
   } else if (penalty == "MCP") {
     double a = 3;
-    for (int i = 1; i < beta.size(); i++) {
+    for (int i = 1; i < (int)beta.size(); i++) {
       double abBeta = std::abs(beta(i));
       if (abBeta <= a * lambda) {
         rst(i) = lambda - abBeta / a;
@@ -49,7 +49,7 @@ double loss(const arma::vec& Y, const arma::vec& Ynew, const std::string lossTyp
     rst = mean(square(Y - Ynew)) / 2;
   } else if (lossType == "Huber") {
     arma::vec res = Y - Ynew;
-    for (int i = 0; i < Y.size(); i++) {
+    for (int i = 0; i < (int)Y.size(); i++) {
       if (std::abs(res(i)) <= tau) {
         rst += res(i) * res(i) / 2;
       } else {
@@ -69,7 +69,7 @@ arma::vec gradLoss(const arma::mat& X, const arma::vec& Y, const arma::vec& beta
   if (lossType == "l2") {
     rst = -1 * (res.t() * X).t();
   } else if (lossType == "Huber") {
-    for (int i = 0; i < Y.size(); i++) {
+    for (int i = 0; i < (int)Y.size(); i++) {
       if (std::abs(res(i)) <= tau) {
         rst -= res(i) * X.row(i).t();
       } else {
