@@ -102,7 +102,7 @@ Huber, P. J. (1964). Robust estimation of a location parameter. Ann. Math. Stati
 
 Sanderson, C. and Curtin, R. (2016). Armadillo: a template-based C++ library for linear algebra. J. Open. Src. Softw. 1 26.
 
-Sun, Q., Zhou, W-X. and Fan, J. (2018) Adaptive Huber Regression, J. Amer. Statist. Assoc, to appear.
+Sun, Q., Zhou, W.-X. and Fan, J. (2018) Adaptive Huber regression, J. Amer. Statist. Assoc, to appear.
 
 Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. J. R. Stat. Soc. Ser. B. Stat. Methodol. 58 267–288.
 
