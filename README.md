@@ -2,7 +2,7 @@
 
 Nonconvex Regularized Robust Regression via I-LAMM (iterative local adaptive majorize-minimization) Algorithm
 
-## Goal of this package
+## Goal of the package
 
 This package employs the I-LAMM algorithm to solve regularized Huber regression. The choice of penalty functions includes the l1-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP). Two tuning parameters lambda and tau (for Huber loss) are calibrated by cross-validation. As a by-product, this package also produces regularized least squares estimators, including the Lasso, SCAD and MCP. See the reference papers for more details. 
 
@@ -27,7 +27,7 @@ For example, `?ncvxHuberReg` will present a detailed documentation with inputs, 
 
 ## Common error messages
 
-The package `ILAMM` is implemented in `Rcpp` and `RcppArmadillo`, so the following error messages might appear when you first install it (we'll keep updating common error messages with feedback from customers):
+The package `ILAMM` is implemented in `Rcpp` and `RcppArmadillo`, so the following error messages might appear when you first install it (we'll keep updating common error messages with feedback from users):
 
 * Error: "...could not find build tools necessary to build ILAMM": For Windows you need Rtools, for Mac OS X you need to install Command Line Tools for XCode. See (https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites). 
 
@@ -49,7 +49,7 @@ There are four functions, all of which are implemented by I-LAMM algorithm.
 
 ## Simple examples 
 
-Here we generate data from a sparse linear model Y = X * beta + epsilon, where beta is sparse and epsilon consists of indepedent coordinates drawn from a log-normal distribution, which is asymmetrix and heavy-tailed. 
+Here we generate data from a sparse linear model Y = X * beta + epsilon, where beta is sparse and epsilon consists of indepedent coordinates from a log-normal distribution, which is asymmetric and heavy-tailed. 
 
 ```{r}
 library(ILAMM)
@@ -61,7 +61,7 @@ beta = c(rep(2, 3), rep(0, d - 3))
 Y = X %*% beta + rlnorm(n, 0, 1.2) - exp(1.2^2 / 2)
 ```
 
-Then we fit five methods on {X, Y}: Lasso, SCAD, Huber-SCAD, MCP and Huber-MCP, and we can evidently find the advantages of Huber-SCAD and Huber-MCP over theor least square counterparts (SCAD and MCP).
+We apply five methods to fit (Y, X): Lasso, SCAD, Huber-SCAD, MCP and Huber-MCP. With heavy-tailed sampling, we can see evident advantages of Huber-SCAD and Huber-MCP over their least squares counterparts, SCAD and MCP.
 
 ```{r}
 fitLasso = cvNcvxReg(X, Y, penalty = "Lasso")
@@ -78,7 +78,7 @@ betaHuberMCP = fitHuberMCP$beta
 
 ## Notes 
 
-Function `cvNcvxHuberReg` might be slow, because we'll do a two-dimensional grid search for cross validation to determine the values of lambda and tau.
+Function `cvNcvxHuberReg` might be slow, because it carries out a two-dimensional grid search for cross-validation to determine the values of lambda and tau.
 
 ## License
 
