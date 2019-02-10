@@ -42,10 +42,10 @@ The package `ILAMM` is implemented in `Rcpp` and `RcppArmadillo`, so the followi
 
 There are four functions, all of which are implemented by I-LAMM algorithm. 
 
-* `ncvxReg`: Non-convex regularized regression (Lasso, SCAD, MCP). 
-* `ncvxHuberReg`: Non-convex regularized Huber regression (Huber-Lasso, Huber-SCAD, Huber-MCP).
-* `cvNcvxReg`: K-fold cross validation for non-convex regularized regression.
-* `cvNcvxHuberReg`: K-fold cross validation for non-convex regularized Huber regression.
+* `ncvxReg`: Nonconvex regularized regression (Lasso, SCAD, MCP). 
+* `ncvxHuberReg`: Nonconvex regularized Huber regression (Huber-Lasso, Huber-SCAD, Huber-MCP).
+* `cvNcvxReg`: K-fold cross-validation for nonconvex regularized regression.
+* `cvNcvxHuberReg`: K-fold cross-validation for nonconvex regularized Huber regression.
 
 ## Simple examples 
 
