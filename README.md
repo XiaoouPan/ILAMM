@@ -100,6 +100,8 @@ Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simu
 
 Huber, P. J. (1964). Robust estimation of a location parameter. Ann. Math. Statist. 35 73–101.
 
+Pan, X., Sun, Q. and Zhou, W.-X. (2019). Nonconvex regularized robust regression with oracle properties in polynomial time. Preprint (https://www.math.ucsd.edu/~wez243/NH.pdf).
+
 Sanderson, C. and Curtin, R. (2016). Armadillo: a template-based C++ library for linear algebra. J. Open. Src. Softw. 1 26.
 
 Sun, Q., Zhou, W.-X. and Fan, J. (2018) Adaptive Huber regression, J. Amer. Statist. Assoc, to appear.
