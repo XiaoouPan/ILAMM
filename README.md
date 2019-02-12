@@ -87,7 +87,9 @@ GPL (>= 2)
 ## Authors
 
 Xiaoou Pan <xip024@ucsd.edu> (https://sites.google.com/view/xopan)
+
 Qiang Sun <qsun@utstat.toronto.edu> (https://sites.google.com/view/qsun)
+
 Wen-Xin Zhou <wez243@ucsd.edu> (https://www.math.ucsd.edu/~wez243/)
 
 ## Reference
