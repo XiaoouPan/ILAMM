@@ -1,4 +1,5 @@
 # include <RcppArmadillo.h>
+# include <cmath>
 # include <iostream>
 # include <string>
 // [[Rcpp::depends(RcppArmadillo)]]
@@ -10,7 +11,7 @@ int sgn(const double x) {
 
 // [[Rcpp::export]]
 arma::vec softThresh(const arma::vec& x, const arma::vec& lambda) {
-  return sign(x) % max(abs(x) - lambda, arma::zeros(x.size()));
+  return arma::sign(x) % arma::max(arma::abs(x) - lambda, arma::zeros(x.size()));
 }
 
 // [[Rcpp::export]]
@@ -46,7 +47,7 @@ double loss(const arma::vec& Y, const arma::vec& Ynew, const std::string lossTyp
             const double tau) {
   double rst = 0;
   if (lossType == "l2") {
-    rst = mean(square(Y - Ynew)) / 2;
+    rst = arma::mean(arma::square(Y - Ynew)) / 2;
   } else if (lossType == "Huber") {
     arma::vec res = Y - Ynew;
     for (int i = 0; i < (int)Y.size(); i++) {
@@ -104,8 +105,8 @@ double cmptPsi(const arma::mat& X, const arma::vec& Y, const arma::vec& betaNew,
                const double tau, const bool intercept) {
   arma::vec diff = betaNew - beta;
   double rst = loss(Y, X * beta, lossType, tau)
-    + as_scalar((gradLoss(X, Y, beta, lossType, tau, intercept)).t() * diff)
-    + phi * as_scalar(diff.t() * diff) / 2;
+    + arma::as_scalar((gradLoss(X, Y, beta, lossType, tau, intercept)).t() * diff)
+    + phi * arma::as_scalar(diff.t() * diff) / 2;
   return rst;
 }
 
@@ -182,7 +183,7 @@ Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
   int n = Y.size();
   int d = X.n_cols - 1;
   if (lambda <= 0) {
-    double lambdaMax = max(abs(Y.t() * X)) / n;
+    double lambdaMax = arma::max(arma::abs(Y.t() * X)) / n;
     double lambdaMin = 0.01 * lambdaMax;
     lambda = std::exp((long double)(0.7 * std::log((long double)lambdaMax)
                                       + 0.3 * std::log((long double)lambdaMin)));
@@ -199,7 +200,7 @@ Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
     betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
     phi = listLAMM["phi"];
     phi = std::max(phi0, phi / gamma);
-    if (norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_c) {
+    if (arma::norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_c) {
       break;
     }
     beta = betaNew;
@@ -221,12 +222,12 @@ Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
         betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
         phi = listLAMM["phi"];
         phi = std::max(phi0, phi / gamma);
-        if (norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_t) {
+        if (arma::norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_t) {
           break;
         }
         beta = betaNew;
       }
-      if (norm(betaNew - beta0, 2) / std::sqrt(d + 1) <= epsilon_t) {
+      if (arma::norm(betaNew - beta0, 2) / std::sqrt(d + 1) <= epsilon_t) {
         break;
       }
     }
@@ -293,7 +294,7 @@ Rcpp::List ncvxHuberReg(arma::mat X, const arma::vec& Y, double lambda = -1,
   int n = Y.size();
   int d = X.n_cols - 1;
   if (lambda <= 0) {
-    double lambdaMax = max(abs(Y.t() * X)) / n;
+    double lambdaMax = arma::max(arma::abs(Y.t() * X)) / n;
     double lambdaMin = 0.01 * lambdaMax;
     lambda = std::exp((long double)(0.7 * std::log((long double)lambdaMax)
                       + 0.3 * std::log((long double)lambdaMin)));
@@ -304,7 +305,7 @@ Rcpp::List ncvxHuberReg(arma::mat X, const arma::vec& Y, double lambda = -1,
     arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
     arma::vec Yhat = X * betaLasso;
     arma::vec res = Y - Yhat;
-    double sigmaHat = median(abs(res - median(res))) / 0.6745;
+    double sigmaHat = arma::median(arma::abs(res - arma::median(res))) / 0.6745;
     tau = sigmaHat * std::sqrt((long double)(n / std::log(n * d)));
   }
   arma::vec beta = arma::zeros(d + 1);
@@ -319,7 +320,7 @@ Rcpp::List ncvxHuberReg(arma::mat X, const arma::vec& Y, double lambda = -1,
     betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
     phi = listLAMM["phi"];
     phi = std::max(phi0, phi / gamma);
-    if (norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_c) {
+    if (arma::norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_c) {
       break;
     }
     beta = betaNew;
@@ -341,12 +342,12 @@ Rcpp::List ncvxHuberReg(arma::mat X, const arma::vec& Y, double lambda = -1,
         betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
         phi = listLAMM["phi"];
         phi = std::max(phi0, phi / gamma);
-        if (norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_t) {
+        if (arma::norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_t) {
           break;
         }
         beta = betaNew;
       }
-      if (norm(betaNew - beta0, 2) / std::sqrt(d + 1) <= epsilon_t) {
+      if (arma::norm(betaNew - beta0, 2) / std::sqrt(d + 1) <= epsilon_t) {
         break;
       }
     }
@@ -447,7 +448,7 @@ Rcpp::List cvNcvxReg(arma::mat& X, const arma::vec& Y,
     lambdaSeq = Rcpp::as<arma::vec>(lSeq);
     nlambda = lambdaSeq.size();
   } else {
-    double lambdaMax = max(abs(Y.t() * X)) / n;
+    double lambdaMax = arma::max(arma::abs(Y.t() * X)) / n;
     double lambdaMin = 0.01 * lambdaMax;
     lambdaSeq = exp(arma::linspace(std::log((long double)lambdaMin),
                                    std::log((long double)lambdaMax), nlambda));
@@ -471,7 +472,7 @@ Rcpp::List cvNcvxReg(arma::mat& X, const arma::vec& Y,
       arma::vec betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
       YPred.rows(idx) = X.rows(idx) * betaHat;
     }
-    mse(i) = norm(Y - YPred, 2);
+    mse(i) = arma::norm(Y - YPred, 2);
   }
   arma::uword cvIdx = mse.index_min();
   Rcpp::List listILAMM = ncvxReg(X, Y, lambdaSeq(cvIdx), penalty, phi0, gamma, epsilon_c,
@@ -555,7 +556,7 @@ Rcpp::List cvNcvxHuberReg(arma::mat& X, const arma::vec& Y,
     lambdaSeq = Rcpp::as<arma::vec>(lSeq);
     nlambda = lambdaSeq.size();
   } else {
-    double lambdaMax = max(abs(Y.t() * X)) / n;
+    double lambdaMax = arma::max(arma::abs(Y.t() * X)) / n;
     double lambdaMin = 0.01 * lambdaMax;
     lambdaSeq = exp(arma::linspace(std::log((long double)lambdaMin),
                     std::log((long double)lambdaMax), nlambda));
@@ -570,7 +571,7 @@ Rcpp::List cvNcvxHuberReg(arma::mat& X, const arma::vec& Y,
     arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
     arma::vec Yhat = X * betaLasso;
     arma::vec res = Y - Yhat;
-    double sigmaHat = median(abs(res - median(res))) / 0.6745;
+    double sigmaHat = arma::median(arma::abs(res - arma::median(res))) / 0.6745;
     arma::vec tauCon = tauConst(ntau);
     tauSeq = sigmaHat * std::sqrt((long double)(n / std::log(n * d))) * tauCon;
   }
@@ -595,7 +596,7 @@ Rcpp::List cvNcvxHuberReg(arma::mat& X, const arma::vec& Y,
         arma::vec betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
         YPred.rows(idx) = X.rows(idx) * betaHat;
       }
-      mse(i, k) = norm(Y - YPred, 2);
+      mse(i, k) = arma::norm(Y - YPred, 2);
     }
   }
   arma::uword cvIdx = mse.index_min();
