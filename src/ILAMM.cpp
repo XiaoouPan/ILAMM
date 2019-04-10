@@ -455,7 +455,6 @@ Rcpp::List cvNcvxReg(arma::mat& X, const arma::vec& Y,
   }
   if (nfolds > 10 || nfolds > n) {
     nfolds = n < 10 ? n : 10;
-    std::cout << "Number of folds is too large, we'll set it to be: " << nfolds << std::endl;
   }
   int size = n / nfolds;
   arma::vec YPred = arma::zeros(n);
@@ -577,7 +576,6 @@ Rcpp::List cvNcvxHuberReg(arma::mat& X, const arma::vec& Y,
   }
   if (nfolds > 10 || nfolds > n) {
     nfolds = n < 10 ? n : 10;
-    std::cout << "Number of folds is too big, we'll set it to be: " << nfolds << std::endl;
   }
   int size = n / nfolds;
   arma::vec YPred = arma::zeros(n);

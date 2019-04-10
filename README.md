@@ -10,7 +10,7 @@ Assume that the observed data (Y, X) follow a linear model Y = X * beta + epsilo
 
 ## Installation
 
-Install ILAMM from github:
+Install `ILAMM` from github:
 
 ```{r gh-installation, eval = FALSE}
 install.packages("devtools")
@@ -92,7 +92,7 @@ Xiaoou Pan <xip024@ucsd.edu>, Qiang Sun <qsun@utstat.toronto.edu>, Wen-Xin Zhou 
 
 Eddelbuettel, D. and Francois, R. (2011). Rcpp: Seamless R and C++ Integration. J. Stat. Softw. 40(8) 1-18. (http://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf)
 
-Eddelbuettel, D. and Sanderson, C. (2014). RcppArmadillo: Accelerating R with high-performance C++ linear algebra. Computational Statistics and Data Analysis, Volume 71, March 2014, pages 1054-1063. (http://dirk.eddelbuettel.com/papers/RcppArmadillo.pdf)
+Eddelbuettel, D. and Sanderson, C. (2014). RcppArmadillo: Accelerating R with high-performance C++ linear algebra. Comp. Stat. Dat. Ana. 71 1054-1063. (http://dirk.eddelbuettel.com/papers/RcppArmadillo.pdf)
 
 Fan, J. and Li, R. (2001). Variable selection via nonconcave penalized likelihood and its oracle properties. J. Amer. Statist. Assoc. 96 1348–1360. (https://www.tandfonline.com/doi/abs/10.1198/016214501753382273)
 
