@@ -47,7 +47,7 @@ There are four functions, all of which are implemented by I-LAMM algorithm.
 * `cvNcvxReg`: K-fold cross-validation for nonconvex regularized regression.
 * `cvNcvxHuberReg`: K-fold cross-validation for nonconvex regularized Huber regression.
 
-## Simple examples 
+## Examples 
 
 Here we generate data from a sparse linear model Y = X * beta + epsilon, where beta is sparse and epsilon consists of indepedent coordinates from a log-normal distribution, which is asymmetric and heavy-tailed. 
 
