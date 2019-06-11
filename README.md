@@ -98,7 +98,7 @@ Fan, J. and Li, R. (2001). Variable selection via nonconcave penalized likelihoo
 
 Fan, J., Li, Q. and Wang, Y. (2017). Estimation of high dimensional mean regression in the absence of symmetry and light tail assumptions. J. R. Stat. Soc. Ser. B. Stat. Methodol. 79 247-265. (https://rss.onlinelibrary.wiley.com/doi/pdf/10.1111/rssb.12166)
 
-Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841. (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6007998/)
+Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841. (https://projecteuclid.org/euclid.aos/1522742437)
 
 Huber, P. J. (1964). Robust estimation of a location parameter. Ann. Math. Statist. 35 73–101. (https://projecteuclid.org/euclid.aoms/1177703732)
 
