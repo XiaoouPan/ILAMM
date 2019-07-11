@@ -25,10 +25,6 @@ updateBeta <- function(X, Y, beta, phi, Lambda, lossType, tau, intercept) {
     .Call('_ILAMM_updateBeta', PACKAGE = 'ILAMM', X, Y, beta, phi, Lambda, lossType, tau, intercept)
 }
 
-cmptF <- function(X, Y, betaNew, lossType, tau) {
-    .Call('_ILAMM_cmptF', PACKAGE = 'ILAMM', X, Y, betaNew, lossType, tau)
-}
-
 cmptPsi <- function(X, Y, betaNew, beta, phi, lossType, tau, intercept) {
     .Call('_ILAMM_cmptPsi', PACKAGE = 'ILAMM', X, Y, betaNew, beta, phi, lossType, tau, intercept)
 }

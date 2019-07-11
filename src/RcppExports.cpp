@@ -90,21 +90,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// cmptF
-double cmptF(const arma::mat& X, const arma::vec& Y, const arma::vec& betaNew, const std::string lossType, const double tau);
-RcppExport SEXP _ILAMM_cmptF(SEXP XSEXP, SEXP YSEXP, SEXP betaNewSEXP, SEXP lossTypeSEXP, SEXP tauSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type betaNew(betaNewSEXP);
-    Rcpp::traits::input_parameter< const std::string >::type lossType(lossTypeSEXP);
-    Rcpp::traits::input_parameter< const double >::type tau(tauSEXP);
-    rcpp_result_gen = Rcpp::wrap(cmptF(X, Y, betaNew, lossType, tau));
-    return rcpp_result_gen;
-END_RCPP
-}
 // cmptPsi
 double cmptPsi(const arma::mat& X, const arma::vec& Y, const arma::vec& betaNew, const arma::vec& beta, const double phi, const std::string lossType, const double tau, const bool intercept);
 RcppExport SEXP _ILAMM_cmptPsi(SEXP XSEXP, SEXP YSEXP, SEXP betaNewSEXP, SEXP betaSEXP, SEXP phiSEXP, SEXP lossTypeSEXP, SEXP tauSEXP, SEXP interceptSEXP) {
@@ -278,7 +263,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_ILAMM_loss", (DL_FUNC) &_ILAMM_loss, 4},
     {"_ILAMM_gradLoss", (DL_FUNC) &_ILAMM_gradLoss, 6},
     {"_ILAMM_updateBeta", (DL_FUNC) &_ILAMM_updateBeta, 8},
-    {"_ILAMM_cmptF", (DL_FUNC) &_ILAMM_cmptF, 5},
     {"_ILAMM_cmptPsi", (DL_FUNC) &_ILAMM_cmptPsi, 8},
     {"_ILAMM_LAMM", (DL_FUNC) &_ILAMM_LAMM, 9},
     {"_ILAMM_ncvxReg", (DL_FUNC) &_ILAMM_ncvxReg, 11},

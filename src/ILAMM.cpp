@@ -94,12 +94,6 @@ arma::vec updateBeta(const arma::mat& X, const arma::vec& Y, arma::vec beta, con
 }
 
 // [[Rcpp::export]]
-double cmptF(const arma::mat& X, const arma::vec& Y, const arma::vec& betaNew,
-             const std::string lossType, const double tau) {
-  return loss(Y, X * betaNew, lossType, tau);
-}
-
-// [[Rcpp::export]]
 double cmptPsi(const arma::mat& X, const arma::vec& Y, const arma::vec& betaNew,
                const arma::vec& beta, const double phi, const std::string lossType,
                const double tau, const bool intercept) {
@@ -118,7 +112,7 @@ Rcpp::List LAMM(const arma::mat& X, const arma::vec& Y, const arma::vec& Lambda,
   arma::vec betaNew = arma::vec();
   while (true) {
     betaNew = updateBeta(X, Y, beta, phiNew, Lambda, lossType, tau, interecept);
-    double FVal = cmptF(X, Y, betaNew, lossType, tau);
+    double FVal = loss(Y, X * betaNew, lossType, tau);
     double PsiVal = cmptPsi(X, Y, betaNew, beta, phiNew, lossType, tau, interecept);
     if (FVal <= PsiVal) {
       break;
