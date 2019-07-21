@@ -10,7 +10,7 @@ Assume that the observed data (Y, X) follow a linear model Y = X * beta + epsilo
 
 ## Installation
 
-Install `ILAMM` from github:
+Install `ILAMM` from GitHub:
 
 ```{r gh-installation, eval = FALSE}
 install.packages("devtools")
