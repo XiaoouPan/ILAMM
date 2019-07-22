@@ -6,8 +6,9 @@
 \usage{
 cvNcvxHuberReg(X, Y, lSeq = NULL, nlambda = 30L, penalty = "SCAD",
   tSeq = NULL, ntau = 5L, phi0 = 0.001, gamma = 1.5,
-  epsilon_c = 1e-04, epsilon_t = 1e-04, iteMax = 500L, nfolds = 3L,
-  intercept = FALSE, itcpIncluded = FALSE)
+  epsilon_c = 0.001, epsilon_t = 0.001, iteMax = 500L, nfolds = 3L,
+  intercept = FALSE, itcpIncluded = FALSE, tf = FALSE,
+  constTau = 2)
 }
 \arguments{
 \item{X}{An \eqn{n} by \eqn{d} design matrix with each row being a sample and each column being a variable, either low-dimensional data (\eqn{d \le n}) or high-dimensional data (\eqn{d > n}) are allowed.}
@@ -79,6 +80,8 @@ fit$tauMin
 }
 \references{
 Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841.
+
+Wang, L., Zheng, C., Zhou, W. and Zhou, W.-X. (2018). A New Principle for Tuning-Free Huber Regression. Preprint.
 }
 \seealso{
 \code{\link{ncvxHuberReg}}

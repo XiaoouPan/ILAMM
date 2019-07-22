@@ -5,7 +5,7 @@
 \title{Non-convex regularized regression}
 \usage{
 ncvxReg(X, Y, lambda = -1, penalty = "SCAD", phi0 = 0.001,
-  gamma = 1.5, epsilon_c = 1e-04, epsilon_t = 1e-04, iteMax = 500L,
+  gamma = 1.5, epsilon_c = 0.001, epsilon_t = 0.001, iteMax = 500L,
   intercept = FALSE, itcpIncluded = FALSE)
 }
 \arguments{

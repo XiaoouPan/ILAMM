@@ -1,20 +1,16 @@
 # include <RcppArmadillo.h>
 # include <cmath>
-# include <iostream>
 # include <string>
 // [[Rcpp::depends(RcppArmadillo)]]
 
-// [[Rcpp::export]]
 int sgn(const double x) {
   return (x > 0) - (x < 0);
 }
 
-// [[Rcpp::export]]
 arma::vec softThresh(const arma::vec& x, const arma::vec& lambda) {
   return arma::sign(x) % arma::max(arma::abs(x) - lambda, arma::zeros(x.size()));
 }
 
-// [[Rcpp::export]]
 arma::vec cmptLambda(const arma::vec& beta, const double lambda, const std::string penalty) {
   arma::vec rst = arma::zeros(beta.size());
   if (penalty == "Lasso") {
@@ -22,8 +18,9 @@ arma::vec cmptLambda(const arma::vec& beta, const double lambda, const std::stri
     rst(0) = 0;
   } else if (penalty == "SCAD") {
     double a = 3.7;
+    double abBeta;
     for (int i = 1; i < (int)beta.size(); i++) {
-      double abBeta = std::abs(beta(i));
+      abBeta = std::abs(beta(i));
       if (abBeta <= lambda) {
         rst(i) = lambda;
       } else if (abBeta <= a * lambda) {
@@ -32,8 +29,9 @@ arma::vec cmptLambda(const arma::vec& beta, const double lambda, const std::stri
     }
   } else if (penalty == "MCP") {
     double a = 3;
+    double abBeta;
     for (int i = 1; i < (int)beta.size(); i++) {
-      double abBeta = std::abs(beta(i));
+      abBeta = std::abs(beta(i));
       if (abBeta <= a * lambda) {
         rst(i) = lambda - abBeta / a;
       }
@@ -42,7 +40,6 @@ arma::vec cmptLambda(const arma::vec& beta, const double lambda, const std::stri
   return rst;
 }
 
-// [[Rcpp::export]]
 double loss(const arma::vec& Y, const arma::vec& Ynew, const std::string lossType,
             const double tau) {
   double rst = 0;
@@ -62,7 +59,6 @@ double loss(const arma::vec& Y, const arma::vec& Ynew, const std::string lossTyp
   return rst;
 }
 
-// [[Rcpp::export]]
 arma::vec gradLoss(const arma::mat& X, const arma::vec& Y, const arma::vec& beta,
                    const std::string lossType, const double tau, const bool interecept) {
   arma::vec res = Y - X * beta;
@@ -84,7 +80,6 @@ arma::vec gradLoss(const arma::mat& X, const arma::vec& Y, const arma::vec& beta
   return rst / Y.size();
 }
 
-// [[Rcpp::export]]
 arma::vec updateBeta(const arma::mat& X, const arma::vec& Y, arma::vec beta, const double phi,
                      const arma::vec& Lambda, const std::string lossType, const double tau,
                      const bool intercept) {
@@ -93,7 +88,6 @@ arma::vec updateBeta(const arma::mat& X, const arma::vec& Y, arma::vec beta, con
   return softThresh(first, second);
 }
 
-// [[Rcpp::export]]
 double cmptPsi(const arma::mat& X, const arma::vec& Y, const arma::vec& betaNew,
                const arma::vec& beta, const double phi, const std::string lossType,
                const double tau, const bool intercept) {
@@ -104,16 +98,17 @@ double cmptPsi(const arma::mat& X, const arma::vec& Y, const arma::vec& betaNew,
   return rst;
 }
 
-// [[Rcpp::export]]
 Rcpp::List LAMM(const arma::mat& X, const arma::vec& Y, const arma::vec& Lambda, arma::vec beta,
                 const double phi, const std::string lossType, const double tau,
                 const double gamma, const bool interecept) {
   double phiNew = phi;
   arma::vec betaNew = arma::vec();
+  double FVal;
+  double PsiVal;
   while (true) {
     betaNew = updateBeta(X, Y, beta, phiNew, Lambda, lossType, tau, interecept);
-    double FVal = loss(Y, X * betaNew, lossType, tau);
-    double PsiVal = cmptPsi(X, Y, betaNew, beta, phiNew, lossType, tau, interecept);
+    FVal = loss(Y, X * betaNew, lossType, tau);
+    PsiVal = cmptPsi(X, Y, betaNew, beta, phiNew, lossType, tau, interecept);
     if (FVal <= PsiVal) {
       break;
     }
@@ -166,12 +161,13 @@ Rcpp::List LAMM(const arma::mat& X, const arma::vec& Y, const arma::vec& Lambda,
 // [[Rcpp::export]]
 Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
                    std::string penalty = "SCAD", const double phi0 = 0.001,
-                   const double gamma = 1.5, const double epsilon_c = 0.0001,
-                   const double epsilon_t = 0.0001, const int iteMax = 500,
+                   const double gamma = 1.5, const double epsilon_c = 0.001,
+                   const double epsilon_t = 0.001, const int iteMax = 500,
                    const bool intercept = false, const bool itcpIncluded = false) {
   if (!itcpIncluded) {
-    arma::mat XX = arma::ones(X.n_rows, X.n_cols + 1);
+    arma::mat XX(X.n_rows, X.n_cols + 1);
     XX.cols(1, X.n_cols) = X;
+    XX.col(0) = arma::ones(X.n_rows);
     X = XX;
   }
   int n = Y.size();
@@ -188,13 +184,14 @@ Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
   arma::vec Lambda = cmptLambda(beta, lambda, penalty);
   double phi = phi0;
   int ite = 0;
+  Rcpp::List listLAMM;
   while (ite <= iteMax) {
     ite++;
-    Rcpp::List listLAMM = LAMM(X, Y, Lambda, beta, phi, "l2", 1, gamma, intercept);
+    listLAMM = LAMM(X, Y, Lambda, beta, phi, "l2", 1, gamma, intercept);
     betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
     phi = listLAMM["phi"];
     phi = std::max(phi0, phi / gamma);
-    if (arma::norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_c) {
+    if (arma::norm(betaNew - beta, "inf") <= epsilon_c) {
       break;
     }
     beta = betaNew;
@@ -212,16 +209,16 @@ Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
       ite = 0;
       while (ite <= iteMax) {
         ite++;
-        Rcpp::List listLAMM  = LAMM(X, Y, Lambda, beta, phi, "l2", 1, gamma, intercept);
+        listLAMM  = LAMM(X, Y, Lambda, beta, phi, "l2", 1, gamma, intercept);
         betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
         phi = listLAMM["phi"];
         phi = std::max(phi0, phi / gamma);
-        if (arma::norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_t) {
+        if (arma::norm(betaNew - beta, "inf") <= epsilon_t) {
           break;
         }
         beta = betaNew;
       }
-      if (arma::norm(betaNew - beta0, 2) / std::sqrt(d + 1) <= epsilon_t) {
+      if (arma::norm(betaNew - beta0, "inf") <= epsilon_t) {
         break;
       }
     }
@@ -259,6 +256,7 @@ Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
 //' }
 //' @author Xiaoou Pan, Qiang Sun, Wen-Xin Zhou
 //' @references Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841.
+//' @references Wang, L., Zheng, C., Zhou, W. and Zhou, W.-X. (2018). A New Principle for Tuning-Free Huber Regression. Preprint.
 //' @seealso \code{\link{cvNcvxHuberReg}}
 //' @examples
 //' n = 50
@@ -277,12 +275,14 @@ Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
 // [[Rcpp::export]]
 Rcpp::List ncvxHuberReg(arma::mat X, const arma::vec& Y, double lambda = -1,
                 std::string penalty = "SCAD", double tau = -1, const double phi0 = 0.001,
-                const double gamma = 1.5, const double epsilon_c = 0.0001,
-                const double epsilon_t = 0.0001, const int iteMax = 500,
-                const bool intercept = false, const bool itcpIncluded = false) {
+                const double gamma = 1.5, const double epsilon_c = 0.001,
+                const double epsilon_t = 0.001, const int iteMax = 500,
+                const bool intercept = false, const bool itcpIncluded = false, 
+                const bool tf = false, const double constTau = 2) {
   if (!itcpIncluded) {
-    arma::mat XX = arma::ones(X.n_rows, X.n_cols + 1);
+    arma::mat XX(X.n_rows, X.n_cols + 1);
     XX.cols(1, X.n_cols) = X;
+    XX.col(0) = arma::ones(X.n_rows);
     X = XX;
   }
   int n = Y.size();
@@ -293,77 +293,141 @@ Rcpp::List ncvxHuberReg(arma::mat X, const arma::vec& Y, double lambda = -1,
     lambda = std::exp((long double)(0.7 * std::log((long double)lambdaMax)
                       + 0.3 * std::log((long double)lambdaMin)));
   }
-  if (tau <= 0) {
-    Rcpp::List listILAMM = ncvxReg(X, Y, lambda, "Lasso", phi0, gamma, epsilon_c, epsilon_t,
-                                   iteMax, intercept, true);
-    arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
-    arma::vec Yhat = X * betaLasso;
-    arma::vec res = Y - Yhat;
-    double sigmaHat = arma::median(arma::abs(res - arma::median(res))) / 0.6745;
-    tau = sigmaHat * std::sqrt((long double)(n / std::log(n * d)));
-  }
-  arma::vec beta = arma::zeros(d + 1);
-  arma::vec betaNew = arma::zeros(d + 1);
-  // Contraction
-  arma::vec Lambda = cmptLambda(beta, lambda, penalty);
-  double phi = phi0;
-  int ite = 0;
-  while (ite <= iteMax) {
-    ite++;
-    Rcpp::List listLAMM = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
-    betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
-    phi = listLAMM["phi"];
-    phi = std::max(phi0, phi / gamma);
-    if (arma::norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_c) {
-      break;
+  if (!tf) {
+    if (tau <= 0) {
+      Rcpp::List listILAMM = ncvxReg(X, Y, lambda, "Lasso", phi0, gamma, epsilon_c, epsilon_t,
+                                     iteMax, intercept, true);
+      arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
+      arma::vec res = Y - X * betaLasso;
+      double mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
+      tau = mad * std::sqrt((long double)(n / std::log(n * d)));
     }
-    beta = betaNew;
-  }
-  int iteT = 0;
-  // Tightening
-  if (penalty != "Lasso") {
-    arma::vec beta0 = arma::zeros(d + 1);
-    while (iteT <= iteMax) {
-      iteT++;
-      beta = betaNew;
-      beta0 = betaNew;
-      Lambda = cmptLambda(beta, lambda, penalty);
-      phi = phi0;
-      ite = 0;
-      while (ite <= iteMax) {
-        ite++;
-        Rcpp::List listLAMM  = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
-        betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
-        phi = listLAMM["phi"];
-        phi = std::max(phi0, phi / gamma);
-        if (arma::norm(betaNew - beta, 2) / std::sqrt(d + 1) <= epsilon_t) {
-          break;
-        }
-        beta = betaNew;
-      }
-      if (arma::norm(betaNew - beta0, 2) / std::sqrt(d + 1) <= epsilon_t) {
+    arma::vec beta = arma::zeros(d + 1);
+    arma::vec betaNew = arma::zeros(d + 1);
+    // Contraction
+    arma::vec Lambda = cmptLambda(beta, lambda, penalty);
+    double phi = phi0;
+    int ite = 0;
+    Rcpp::List listLAMM;
+    while (ite <= iteMax) {
+      ite++;
+      listLAMM = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
+      betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
+      phi = listLAMM["phi"];
+      phi = std::max(phi0, phi / gamma);
+      if (arma::norm(betaNew - beta, "inf") <= epsilon_c) {
         break;
       }
+      beta = betaNew;
     }
+    int iteT = 0;
+    // Tightening
+    if (penalty != "Lasso") {
+      arma::vec beta0 = arma::zeros(d + 1);
+      while (iteT <= iteMax) {
+        iteT++;
+        beta = betaNew;
+        beta0 = betaNew;
+        Lambda = cmptLambda(beta, lambda, penalty);
+        phi = phi0;
+        ite = 0;
+        while (ite <= iteMax) {
+          ite++;
+          listLAMM  = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
+          betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
+          phi = listLAMM["phi"];
+          phi = std::max(phi0, phi / gamma);
+          if (arma::norm(betaNew - beta, "inf") <= epsilon_t) {
+            break;
+          }
+          beta = betaNew;
+        }
+        if (arma::norm(betaNew - beta0, "inf") <= epsilon_t) {
+          break;
+        }
+      }
+    }
+    return Rcpp::List::create(Rcpp::Named("beta") = betaNew, Rcpp::Named("phi") = phi,
+                              Rcpp::Named("penalty") = penalty, Rcpp::Named("lambda") = lambda,
+                              Rcpp::Named("tau") = tau, Rcpp::Named("IteTightening") = iteT);
+  } else {
+    arma::vec res(n);
+    double mad;
+    if (tau <= 0) {
+      Rcpp::List listILAMM = ncvxReg(X, Y, lambda, "Lasso", phi0, gamma, epsilon_c, epsilon_t,
+                                     iteMax, intercept, true);
+      arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
+      res = Y - X * betaLasso;
+      mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
+      tau = constTau * mad;
+    }
+    arma::vec beta = arma::zeros(d + 1);
+    arma::vec betaNew = arma::zeros(d + 1);
+    // Contraction
+    arma::vec Lambda = cmptLambda(beta, lambda, penalty);
+    double phi = phi0;
+    int ite = 0;
+    Rcpp::List listLAMM;
+    while (ite <= iteMax) {
+      ite++;
+      listLAMM = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
+      betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
+      phi = listLAMM["phi"];
+      phi = std::max(phi0, phi / gamma);
+      if (arma::norm(betaNew - beta, "inf") <= epsilon_c) {
+        break;
+      }
+      beta = betaNew;
+      res = Y - X * beta;
+      mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
+      tau = constTau * mad;
+    }
+    int iteT = 0;
+    // Tightening
+    if (penalty != "Lasso") {
+      arma::vec beta0 = arma::zeros(d + 1);
+      while (iteT <= iteMax) {
+        iteT++;
+        beta = betaNew;
+        beta0 = betaNew;
+        Lambda = cmptLambda(beta, lambda, penalty);
+        phi = phi0;
+        ite = 0;
+        while (ite <= iteMax) {
+          ite++;
+          listLAMM  = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
+          betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
+          phi = listLAMM["phi"];
+          phi = std::max(phi0, phi / gamma);
+          if (arma::norm(betaNew - beta, "inf") <= epsilon_t) {
+            break;
+          }
+          beta = betaNew;
+          res = Y - X * beta;
+          mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
+          tau = constTau * mad;
+        }
+        if (arma::norm(betaNew - beta0, "inf") <= epsilon_t) {
+          break;
+        }
+      }
+    }
+    return Rcpp::List::create(Rcpp::Named("beta") = betaNew, Rcpp::Named("phi") = phi,
+                              Rcpp::Named("penalty") = penalty, Rcpp::Named("lambda") = lambda,
+                              Rcpp::Named("tau") = tau, Rcpp::Named("IteTightening") = iteT);
   }
-  return Rcpp::List::create(Rcpp::Named("beta") = betaNew, Rcpp::Named("phi") = phi,
-                            Rcpp::Named("penalty") = penalty, Rcpp::Named("lambda") = lambda,
-                            Rcpp::Named("tau") = tau, Rcpp::Named("IteTightening") = iteT);
 }
 
-// [[Rcpp::export]]
 arma::uvec getIndex(const int n, const int low, const int up) {
   arma::vec seq = arma::regspace(0, n - 1);
   return arma::find(seq >= low && seq <= up);
 }
 
-// [[Rcpp::export]]
 arma::uvec getIndexComp(const int n, const int low, const int up) {
   arma::vec seq = arma::regspace(0, n - 1);
   return arma::find(seq < low || seq > up);
 }
 
-// [[Rcpp::export]]
 arma::vec tauConst(int n) {
   int end = n >> 1;
   int start = (n == end << 1) ? (end - 1) : end;
@@ -428,12 +492,13 @@ arma::vec tauConst(int n) {
 Rcpp::List cvNcvxReg(arma::mat& X, const arma::vec& Y,
                     Rcpp::Nullable<Rcpp::NumericVector> lSeq = R_NilValue, int nlambda = 30,
                     const std::string penalty = "SCAD", const double phi0 = 0.001,
-                    const double gamma = 1.5, const double epsilon_c = 0.0001,
-                    const double epsilon_t = 0.0001, const int iteMax = 500, int nfolds = 3,
+                    const double gamma = 1.5, const double epsilon_c = 0.001,
+                    const double epsilon_t = 0.001, const int iteMax = 500, int nfolds = 3,
                     const bool intercept = false, const bool itcpIncluded = false) {
   if (!itcpIncluded) {
-    arma::mat XX = arma::ones(X.n_rows, X.n_cols + 1);
+    arma::mat XX(X.n_rows, X.n_cols + 1);
     XX.cols(1, X.n_cols) = X;
+    XX.col(0) = arma::ones(X.n_rows);
     X = XX;
   }
   int n = Y.size();
@@ -451,29 +516,96 @@ Rcpp::List cvNcvxReg(arma::mat& X, const arma::vec& Y,
     nfolds = n < 10 ? n : 10;
   }
   int size = n / nfolds;
-  arma::vec YPred = arma::zeros(n);
-  arma::vec beta = arma::zeros(X.n_cols);
-  arma::vec mse = arma::zeros(nlambda);
+  arma::vec YPred(n);
+  arma::vec betaHat(X.n_cols);
+  arma::vec mse(nlambda);
+  int low, up;
+  arma::uvec idx, idxComp;
+  Rcpp::List listILAMM;
   for (int i = 0; i < nlambda; i++) {
     for (int j = 0; j < nfolds; j++) {
-      int low = j * size;
-      int up = (j == (nfolds - 1)) ? (n - 1) : ((j + 1) * size - 1);
-      arma::uvec idx = getIndex(n, low, up);
-      arma::uvec idxComp = getIndexComp(n, low, up);
-      Rcpp::List listILAMM = ncvxReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i), penalty,
+      low = j * size;
+      up = (j == (nfolds - 1)) ? (n - 1) : ((j + 1) * size - 1);
+      idx = getIndex(n, low, up);
+      idxComp = getIndexComp(n, low, up);
+      listILAMM = ncvxReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i), penalty,
                                      phi0, gamma, epsilon_c, epsilon_t, iteMax, intercept, true);
-      arma::vec betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
+      betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
       YPred.rows(idx) = X.rows(idx) * betaHat;
     }
     mse(i) = arma::norm(Y - YPred, 2);
   }
   arma::uword cvIdx = mse.index_min();
-  Rcpp::List listILAMM = ncvxReg(X, Y, lambdaSeq(cvIdx), penalty, phi0, gamma, epsilon_c,
+  listILAMM = ncvxReg(X, Y, lambdaSeq(cvIdx), penalty, phi0, gamma, epsilon_c,
                                  epsilon_t, iteMax, intercept, true);
-  beta = Rcpp::as<arma::vec>(listILAMM["beta"]);
+  arma::vec beta = Rcpp::as<arma::vec>(listILAMM["beta"]);
   return Rcpp::List::create(Rcpp::Named("beta") = beta, Rcpp::Named("penalty") = penalty,
                             Rcpp::Named("lambdaSeq") = lambdaSeq, Rcpp::Named("mse") = mse,
                             Rcpp::Named("lambdaMin") = lambdaSeq(cvIdx), Rcpp::Named("nfolds") = nfolds);
+}
+
+double f1(const double x, const arma::vec& resSq, const int n) {
+  return arma::sum(arma::min(resSq, x * arma::ones(n))) / (n * x) - std::log(n) / n;
+}
+
+double rootf1(const arma::vec& resSq, const int n, double low, double up, 
+              const double tol = 0.00001, const int maxIte = 500) {
+  int ite = 0;
+  double mid;
+  double val;
+  while (ite <= maxIte && up - low > tol) {
+    mid = (up + low) / 2;
+    val = f1(mid, resSq, n);
+    if (val == 0) {
+      return mid;
+    } else if (val < 0) {
+      up = mid;
+    } else {
+      low = mid;
+    }
+    ite++;
+  }
+  return (low + up) / 2;
+}
+
+double huberMean(const arma::vec& X, const double epsilon = 0.00001, const int iteMax = 500) {
+  int n = X.size();
+  double muOld = 0;
+  double muNew = arma::mean(X);
+  double tauOld = 0;
+  double tauNew = arma::stddev(X) * std::sqrt((long double)n / std::log(n));
+  int iteNum = 0;
+  arma::vec res(n);
+  arma::vec resSq(n);
+  arma::vec w(n);
+  while (((std::abs(muNew - muOld) > epsilon) || (std::abs(tauNew - tauOld) > epsilon)) && iteNum < iteMax) {
+    muOld = muNew;
+    tauOld = tauNew;
+    res = X - muOld * arma::ones(n);
+    resSq = arma::square(res);
+    tauNew = std::sqrt((long double)rootf1(resSq, n, arma::min(resSq), arma::sum(resSq)));
+    w = arma::min(tauNew * arma::ones(n) / arma::abs(res), arma::ones(n));
+    muNew = arma::as_scalar(X.t() * w) / arma::sum(w);
+    iteNum++;
+  }
+  return muNew;
+}
+
+double pairPred(const arma::mat& X, const arma::vec& Y, const arma::vec& beta) {
+  int n = X.n_rows;
+  int d = X.n_cols - 1;
+  int m = n * (n - 1) >> 1;
+  arma::mat pairX(m, d + 1);
+  arma::vec pairY(m);
+  int k = 0;
+  for (int i = 0; i < n; i++) {
+    for (int j = i + 1; j < n; j++) {
+      pairX.row(k) = X.row(i) - X.row(j);
+      pairY(k++) = Y(i) - Y(j);
+    }
+  }
+  arma::vec predY = pairX * beta;
+  return arma::sum(arma::square(pairY - predY));
 }
 
 //' The function performs k-fold cross validation for (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented via I-LAMM algorithm.
@@ -509,6 +641,7 @@ Rcpp::List cvNcvxReg(arma::mat& X, const arma::vec& Y,
 //' }
 //' @author Xiaoou Pan, Qiang Sun, Wen-Xin Zhou
 //' @references Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841.
+//' @references Wang, L., Zheng, C., Zhou, W. and Zhou, W.-X. (2018). A New Principle for Tuning-Free Huber Regression. Preprint.
 //' @seealso \code{\link{ncvxHuberReg}}
 //' @examples
 //' n = 50
@@ -534,16 +667,22 @@ Rcpp::List cvNcvxHuberReg(arma::mat& X, const arma::vec& Y,
                   const std::string penalty = "SCAD",
                   Rcpp::Nullable<Rcpp::NumericVector> tSeq = R_NilValue, int ntau = 5,
                   const double phi0 = 0.001, const double gamma = 1.5,
-                  const double epsilon_c = 0.0001, const double epsilon_t = 0.0001,
+                  const double epsilon_c = 0.001, const double epsilon_t = 0.001,
                   const int iteMax = 500, int nfolds = 3, const bool intercept = false,
-                  const bool itcpIncluded = false) {
+                  const bool itcpIncluded = false, const bool tf = false, 
+                  const double constTau = 2) {
   if (!itcpIncluded) {
-    arma::mat XX = arma::ones(X.n_rows, X.n_cols + 1);
+    arma::mat XX(X.n_rows, X.n_cols + 1);
     XX.cols(1, X.n_cols) = X;
+    XX.col(0) = arma::ones(X.n_rows);
     X = XX;
   }
   int n = Y.size();
   int d = X.n_cols - 1;
+  if (nfolds > 10 || nfolds > n) {
+    nfolds = n < 10 ? n : 10;
+  }
+  int size = n / nfolds;
   arma::vec lambdaSeq = arma::vec();
   if (lSeq.isNotNull()) {
     lambdaSeq = Rcpp::as<arma::vec>(lSeq);
@@ -554,52 +693,107 @@ Rcpp::List cvNcvxHuberReg(arma::mat& X, const arma::vec& Y,
     lambdaSeq = exp(arma::linspace(std::log((long double)lambdaMin),
                     std::log((long double)lambdaMax), nlambda));
   }
-  arma::vec tauSeq = arma::vec();
-  if (tSeq.isNotNull()) {
-    tauSeq = Rcpp::as<arma::vec>(tSeq);
-    ntau = tauSeq.size();
-  } else {
-    Rcpp::List listILAMM = cvNcvxReg(X, Y, lSeq, nlambda, "Lasso", phi0, gamma, epsilon_c,
-                                     epsilon_t, iteMax, nfolds, intercept, true);
-    arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
-    arma::vec Yhat = X * betaLasso;
-    arma::vec res = Y - Yhat;
-    double sigmaHat = arma::median(arma::abs(res - arma::median(res))) / 0.6745;
-    arma::vec tauCon = tauConst(ntau);
-    tauSeq = sigmaHat * std::sqrt((long double)(n / std::log(n * d))) * tauCon;
-  }
-  if (nfolds > 10 || nfolds > n) {
-    nfolds = n < 10 ? n : 10;
-  }
-  int size = n / nfolds;
-  arma::vec YPred = arma::zeros(n);
-  arma::vec beta = arma::zeros(X.n_cols);
-  arma::mat mse = arma::zeros(nlambda, ntau);
-  for (int i = 0; i < nlambda; i++) {
-    for (int k = 0; k < ntau; k++) {
+  if (!tf) {
+    arma::vec tauSeq = arma::vec();
+    Rcpp::List listILAMM;
+    if (tSeq.isNotNull()) {
+      tauSeq = Rcpp::as<arma::vec>(tSeq);
+      ntau = tauSeq.size();
+    } else {
+      listILAMM = cvNcvxReg(X, Y, lSeq, nlambda, "Lasso", phi0, gamma, epsilon_c,
+                                       epsilon_t, iteMax, nfolds, intercept, true);
+      arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
+      arma::vec res = Y - X * betaLasso;
+      double mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
+      arma::vec tauCon = tauConst(ntau);
+      tauSeq = mad * std::sqrt((long double)(n / std::log(n * d))) * tauCon;
+    }
+    arma::vec YPred(n);
+    arma::vec betaHat(d + 1);
+    arma::mat mse(nlambda, ntau);
+    int low, up;
+    arma::uvec idx, idxComp;
+    for (int i = 0; i < nlambda; i++) {
+      for (int k = 0; k < ntau; k++) {
+        for (int j = 0; j < nfolds; j++) {
+          low = j * size;
+          up = (j == (nfolds - 1)) ? (n - 1) : ((j + 1) * size - 1);
+          idx = getIndex(n, low, up);
+          idxComp = getIndexComp(n, low, up);
+          listILAMM = ncvxHuberReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i),
+                                              penalty, tauSeq(k), phi0, gamma, epsilon_c, epsilon_t,
+                                              iteMax, intercept, true, tf, constTau);
+          betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
+          YPred.rows(idx) = X.rows(idx) * betaHat;
+        }
+        mse(i, k) = arma::norm(Y - YPred, 2);
+      }
+    }
+    arma::uword cvIdx = mse.index_min();
+    arma::uword idxLambda = cvIdx - (cvIdx / nlambda) * nlambda;
+    arma::uword idxTau = cvIdx / nlambda;
+    listILAMM = ncvxHuberReg(X, Y, lambdaSeq(idxLambda), penalty, tauSeq(idxTau), phi0,
+                                        gamma, epsilon_c, epsilon_t, iteMax, intercept, true, tf,
+                                        constTau);
+    arma::vec beta = Rcpp::as<arma::vec>(listILAMM["beta"]);
+    return Rcpp::List::create(Rcpp::Named("beta") = beta, Rcpp::Named("penalty") = penalty,
+                              Rcpp::Named("lambdaSeq") = lambdaSeq, Rcpp::Named("tauSeq") = tauSeq,
+                              Rcpp::Named("mse") = mse, Rcpp::Named("lambdaMin") = lambdaSeq(idxLambda),
+                              Rcpp::Named("tauMin") = tauSeq(idxTau), Rcpp::Named("nfolds") = nfolds);
+  } else if (!intercept) {
+    arma::vec YPred(n);
+    arma::vec betaHat(d + 1);
+    arma::vec mse(nlambda);
+    int low, up;
+    arma::uvec idx, idxComp;
+    Rcpp::List listILAMM;
+    for (int i = 0; i < nlambda; i++) {
       for (int j = 0; j < nfolds; j++) {
-        int low = j * size;
-        int up = (j == (nfolds - 1)) ? (n - 1) : ((j + 1) * size - 1);
-        arma::uvec idx = getIndex(n, low, up);
-        arma::uvec idxComp = getIndexComp(n, low, up);
-        Rcpp::List listILAMM = ncvxHuberReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i),
-                                            penalty, tauSeq(k), phi0, gamma, epsilon_c, epsilon_t,
-                                            iteMax, intercept, true);
-        arma::vec betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
+        low = j * size;
+        up = (j == (nfolds - 1)) ? (n - 1) : ((j + 1) * size - 1);
+        idx = getIndex(n, low, up);
+        idxComp = getIndexComp(n, low, up);
+        listILAMM = ncvxHuberReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i),
+                                 penalty, -1, phi0, gamma, epsilon_c, epsilon_t,
+                                 iteMax, intercept, true, tf, constTau);
+        betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
         YPred.rows(idx) = X.rows(idx) * betaHat;
       }
-      mse(i, k) = arma::norm(Y - YPred, 2);
+      mse(i) = arma::norm(Y - YPred, 2);
     }
+    arma::uword cvIdx = mse.index_min();
+    listILAMM = ncvxHuberReg(X, Y, lambdaSeq(cvIdx), penalty, -1, phi0, gamma, epsilon_c, 
+                             epsilon_t, iteMax, intercept, true, tf, constTau);
+    arma::vec beta = Rcpp::as<arma::vec>(listILAMM["beta"]);
+    return Rcpp::List::create(Rcpp::Named("beta") = beta, Rcpp::Named("penalty") = penalty,
+                              Rcpp::Named("lambdaSeq") = lambdaSeq, Rcpp::Named("lambdaMin") = lambdaSeq(cvIdx),
+                              Rcpp::Named("tau") = listILAMM["tau"], Rcpp::Named("nfolds") = nfolds);
+  } else {
+    arma::vec betaHat(d + 1);
+    arma::vec mse = arma::zeros(nlambda);
+    int low, up;
+    arma::uvec idx, idxComp;
+    Rcpp::List listILAMM;
+    for (int i = 0; i < nlambda; i++) {
+      for (int j = 0; j < nfolds; j++) {
+        low = j * size;
+        up = (j == (nfolds - 1)) ? (n - 1) : ((j + 1) * size - 1);
+        idx = getIndex(n, low, up);
+        idxComp = getIndexComp(n, low, up);
+        listILAMM = ncvxHuberReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i),
+                                            penalty, -1, phi0, gamma, epsilon_c, epsilon_t,
+                                            iteMax, intercept, true, tf, constTau);
+        betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
+        mse(i) += pairPred(X.rows(idx), Y.rows(idx), betaHat);
+      }
+    }
+    arma::uword cvIdx = mse.index_min();
+    listILAMM = ncvxHuberReg(X, Y, lambdaSeq(cvIdx), penalty, -1, phi0, gamma, epsilon_c, 
+                                        epsilon_t, iteMax, intercept, true, tf, constTau);
+    arma::vec beta = Rcpp::as<arma::vec>(listILAMM["beta"]);
+    beta(0) = huberMean(Y - X.cols(1, d) * beta.rows(1, d));
+    return Rcpp::List::create(Rcpp::Named("beta") = beta, Rcpp::Named("penalty") = penalty,
+                              Rcpp::Named("lambdaSeq") = lambdaSeq, Rcpp::Named("lambdaMin") = lambdaSeq(cvIdx),
+                              Rcpp::Named("tau") = listILAMM["tau"], Rcpp::Named("nfolds") = nfolds);
   }
-  arma::uword cvIdx = mse.index_min();
-  arma::uword idxLambda = cvIdx - (cvIdx / nlambda) * nlambda;
-  arma::uword idxTau = cvIdx / nlambda;
-  Rcpp::List listILAMM = ncvxHuberReg(X, Y, lambdaSeq(idxLambda), penalty, tauSeq(idxTau), phi0,
-                                      gamma, epsilon_c, epsilon_t, iteMax, intercept, true);
-  beta = Rcpp::as<arma::vec>(listILAMM["beta"]);
-  return Rcpp::List::create(Rcpp::Named("beta") = beta, Rcpp::Named("penalty") = penalty,
-                            Rcpp::Named("lambdaSeq") = lambdaSeq, Rcpp::Named("tauSeq") = tauSeq,
-                            Rcpp::Named("mse") = mse, Rcpp::Named("lambdaMin") = lambdaSeq(idxLambda),
-                            Rcpp::Named("tauMin") = tauSeq(idxTau), Rcpp::Named("nfolds") = nfolds);
 }
-

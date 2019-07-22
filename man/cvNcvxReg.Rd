@@ -5,7 +5,7 @@
 \title{K-fold cross validation for non-convex regularized regression}
 \usage{
 cvNcvxReg(X, Y, lSeq = NULL, nlambda = 30L, penalty = "SCAD",
-  phi0 = 0.001, gamma = 1.5, epsilon_c = 1e-04, epsilon_t = 1e-04,
+  phi0 = 0.001, gamma = 1.5, epsilon_c = 0.001, epsilon_t = 0.001,
   iteMax = 500L, nfolds = 3L, intercept = FALSE,
   itcpIncluded = FALSE)
 }
