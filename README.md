@@ -40,12 +40,13 @@ The package `ILAMM` is implemented in `Rcpp` and `RcppArmadillo`, so the followi
 
 ## Functions
 
-There are four functions, all of which are implemented by I-LAMM algorithm. 
+There are five functions, all of which are implemented by I-LAMM algorithm. 
 
 * `ncvxReg`: Nonconvex regularized regression (Lasso, SCAD, MCP). 
 * `ncvxHuberReg`: Nonconvex regularized Huber regression (Huber-Lasso, Huber-SCAD, Huber-MCP).
 * `cvNcvxReg`: K-fold cross-validation for nonconvex regularized regression.
 * `cvNcvxHuberReg`: K-fold cross-validation for nonconvex regularized Huber regression.
+* `tfNcvxHuberReg`: Tuning-free nonconvex regularized Huber regression.
 
 ## Examples 
 
@@ -109,5 +110,7 @@ Sanderson, C. and Curtin, R. (2016). Armadillo: a template-based C++ library for
 Sun, Q., Zhou, W.-X. and Fan, J. (2018) Adaptive Huber regression, J. Amer. Statist. Assoc, to appear. (https://www.tandfonline.com/doi/abs/10.1080/01621459.2018.1543124)
 
 Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. J. R. Stat. Soc. Ser. B. Stat. Methodol. 58 267–288. (https://www.jstor.org/stable/2346178?seq=1#metadata_info_tab_contents)
+
+Wang, L., Zheng, C., Zhou, W. and Zhou, W.-X. (2018). A new principle for tuning-free Huber regression. Preprint. (https://www.math.ucsd.edu/~wez243/Tuning_Free.pdf)
 
 Zhang, C.-H. (2010). Nearly unbiased variable selection under minimax concave penalty. Ann. Statist. 38 894–942. (https://projecteuclid.org/euclid.aos/1266586618)
