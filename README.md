@@ -6,7 +6,7 @@ Nonconvex Regularized Robust Regression via I-LAMM (iterative local adaptive maj
 
 This package employs the I-LAMM algorithm to solve regularized Huber regression. The choice of penalty functions includes the l1-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP). Two tuning parameters lambda and tau (for Huber loss) are calibrated by cross-validation. As a by-product, this package also produces regularized least squares estimators, including the Lasso, SCAD and MCP. See the reference papers for more details. 
 
-Assume that the observed data (Y, X) follow a linear model $Y = X \beta + \epsilon$, where Y is an n-dimensional response vector, X is an n by d design matrix, beta is a sparse vector and epsilon is an n-vector of noise variables whose distributions can be asymmetric and/or heavy-tailed. The package will compute the regularized Huber regression estimator.
+Assume that the observed data (Y, X) follow a linear model Y = X * beta + epsilon, where Y is an n-dimensional response vector, X is an n by d design matrix, beta is a sparse vector and epsilon is an n-vector of noise variables whose distributions can be asymmetric and/or heavy-tailed. The package will compute the regularized Huber regression estimator.
 
 ## Installation
 
@@ -29,7 +29,7 @@ For example, `?ncvxHuberReg` will present a detailed documentation with inputs, 
 
 The package `ILAMM` is implemented in `Rcpp` and `RcppArmadillo`, so the following error messages might appear when you first install it (we'll keep updating common error messages with feedback from users):
 
-* Error: "...could not find build tools necessary to build ILAMM": For Windows you need Rtools, for Mac OS X you need to install Command Line Tools for XCode. See (https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites). 
+* Error: "...could not find build tools necessary to build ILAMM": For Windows you need Rtools, for Mac OS X you need to install Command Line Tools for XCode. See [this link](https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites). 
 
 * Error: "library not found for -lgfortran/-lquadmath": It means your gfortran binaries are out of date. This is a common environment specific issue. 
 
