@@ -117,7 +117,7 @@ Rcpp::List LAMM(const arma::mat& X, const arma::vec& Y, const arma::vec& Lambda,
   return Rcpp::List::create(Rcpp::Named("beta") = betaNew, Rcpp::Named("phi") = phiNew);
 }
 
-//' The function fits (high-dimensional) regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented via I-LAMM algorithm.
+//' The function fits (high-dimensional) regularized regression with non-convex penalties: Lasso, SCAD and MCP.
 //'
 //' The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. Tunning parameter \eqn{\lambda} has a default setting but it can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
 //'
@@ -228,7 +228,7 @@ Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
                             Rcpp::Named("IteTightening") = iteT);
 }
 
-//' The function fits (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented via I-LAMM algorithm.
+//' The function fits (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP.
 //'
 //' The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. Tunning parameters \eqn{\lambda} and \eqn{\tau} have default settings but they can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
 //'
@@ -245,8 +245,6 @@ Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
 //' @param iteMax The maximal number of iteration in either contraction or tightening stage, if this number is reached, the convergence of I-LAMM is failed. The defalut value is 500.
 //' @param intercept Boolean value indicating whether an intercept term should be included into the model. The default setting is \code{FALSE}.
 //' @param itcpIncluded Boolean value indicating whether a column of 1's has been included in the design matrix \eqn{X}. The default setting is \code{FALSE}.
-//' @param tf Boolean value indicating whether a tuning-free principle is applied to calibrate the value of \code{tau}. The default setting is \code{FALSE}.
-//' @param constTau The constant used in tuning-free procedure to update \code{tau}. The default value is 2.
 //' @return A list including the following terms will be returned:
 //' \itemize{
 //' \item \code{beta} The estimated \eqn{\beta}, a vector with length d + 1, with the first one being the value of intercept (0 if \code{intercept = FALSE}).
@@ -258,7 +256,6 @@ Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
 //' }
 //' @author Xiaoou Pan, Qiang Sun, Wen-Xin Zhou
 //' @references Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841.
-//' @references Wang, L., Zheng, C., Zhou, W. and Zhou, W.-X. (2018). A New Principle for Tuning-Free Huber Regression. Preprint.
 //' @seealso \code{\link{cvNcvxHuberReg}}
 //' @examples
 //' n = 50
@@ -276,11 +273,10 @@ Rcpp::List ncvxReg(arma::mat X, const arma::vec& Y, double lambda = -1,
 //' @export
 // [[Rcpp::export]]
 Rcpp::List ncvxHuberReg(arma::mat X, const arma::vec& Y, double lambda = -1,
-                std::string penalty = "SCAD", double tau = -1, const double phi0 = 0.001,
-                const double gamma = 1.5, const double epsilon_c = 0.001,
-                const double epsilon_t = 0.001, const int iteMax = 500,
-                const bool intercept = false, const bool itcpIncluded = false, 
-                const bool tf = false, const double constTau = 2) {
+                        const std::string penalty = "SCAD", double tau = -1, const double phi0 = 0.001,
+                        const double gamma = 1.5, const double epsilon_c = 0.001,
+                        const double epsilon_t = 0.001, const int iteMax = 500,
+                        const bool intercept = false, const bool itcpIncluded = false) {
   if (!itcpIncluded) {
     arma::mat XX(X.n_rows, X.n_cols + 1);
     XX.cols(1, X.n_cols) = X;
@@ -295,129 +291,62 @@ Rcpp::List ncvxHuberReg(arma::mat X, const arma::vec& Y, double lambda = -1,
     lambda = std::exp((long double)(0.7 * std::log((long double)lambdaMax)
                       + 0.3 * std::log((long double)lambdaMin)));
   }
-  if (!tf) {
-    if (tau <= 0) {
-      Rcpp::List listILAMM = ncvxReg(X, Y, lambda, "Lasso", phi0, gamma, epsilon_c, epsilon_t,
-                                     iteMax, intercept, true);
-      arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
-      arma::vec res = Y - X * betaLasso;
-      double mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
-      tau = mad * std::sqrt((long double)(n / std::log(n * d)));
-    }
-    arma::vec beta = arma::zeros(d + 1);
-    arma::vec betaNew = arma::zeros(d + 1);
-    // Contraction
-    arma::vec Lambda = cmptLambda(beta, lambda, penalty);
-    double phi = phi0;
-    int ite = 0;
-    Rcpp::List listLAMM;
-    while (ite <= iteMax) {
-      ite++;
-      listLAMM = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
-      betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
-      phi = listLAMM["phi"];
-      phi = std::max(phi0, phi / gamma);
-      if (arma::norm(betaNew - beta, "inf") <= epsilon_c) {
-        break;
-      }
-      beta = betaNew;
-    }
-    int iteT = 0;
-    // Tightening
-    if (penalty != "Lasso") {
-      arma::vec beta0 = arma::zeros(d + 1);
-      while (iteT <= iteMax) {
-        iteT++;
-        beta = betaNew;
-        beta0 = betaNew;
-        Lambda = cmptLambda(beta, lambda, penalty);
-        phi = phi0;
-        ite = 0;
-        while (ite <= iteMax) {
-          ite++;
-          listLAMM  = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
-          betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
-          phi = listLAMM["phi"];
-          phi = std::max(phi0, phi / gamma);
-          if (arma::norm(betaNew - beta, "inf") <= epsilon_t) {
-            break;
-          }
-          beta = betaNew;
-        }
-        if (arma::norm(betaNew - beta0, "inf") <= epsilon_t) {
-          break;
-        }
-      }
-    }
-    return Rcpp::List::create(Rcpp::Named("beta") = betaNew, Rcpp::Named("phi") = phi,
-                              Rcpp::Named("penalty") = penalty, Rcpp::Named("lambda") = lambda,
-                              Rcpp::Named("tau") = tau, Rcpp::Named("IteTightening") = iteT);
-  } else {
-    arma::vec res(n);
-    double mad;
-    if (tau <= 0) {
-      Rcpp::List listILAMM = ncvxReg(X, Y, lambda, "Lasso", phi0, gamma, epsilon_c, epsilon_t,
-                                     iteMax, intercept, true);
-      arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
-      res = Y - X * betaLasso;
-      mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
-      tau = constTau * mad;
-    }
-    arma::vec beta = arma::zeros(d + 1);
-    arma::vec betaNew = arma::zeros(d + 1);
-    // Contraction
-    arma::vec Lambda = cmptLambda(beta, lambda, penalty);
-    double phi = phi0;
-    int ite = 0;
-    Rcpp::List listLAMM;
-    while (ite <= iteMax) {
-      ite++;
-      listLAMM = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
-      betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
-      phi = listLAMM["phi"];
-      phi = std::max(phi0, phi / gamma);
-      if (arma::norm(betaNew - beta, "inf") <= epsilon_c) {
-        break;
-      }
-      beta = betaNew;
-      res = Y - X * beta;
-      mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
-      tau = constTau * mad;
-    }
-    int iteT = 0;
-    // Tightening
-    if (penalty != "Lasso") {
-      arma::vec beta0 = arma::zeros(d + 1);
-      while (iteT <= iteMax) {
-        iteT++;
-        beta = betaNew;
-        beta0 = betaNew;
-        Lambda = cmptLambda(beta, lambda, penalty);
-        phi = phi0;
-        ite = 0;
-        while (ite <= iteMax) {
-          ite++;
-          listLAMM  = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
-          betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
-          phi = listLAMM["phi"];
-          phi = std::max(phi0, phi / gamma);
-          if (arma::norm(betaNew - beta, "inf") <= epsilon_t) {
-            break;
-          }
-          beta = betaNew;
-          res = Y - X * beta;
-          mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
-          tau = constTau * mad;
-        }
-        if (arma::norm(betaNew - beta0, "inf") <= epsilon_t) {
-          break;
-        }
-      }
-    }
-    return Rcpp::List::create(Rcpp::Named("beta") = betaNew, Rcpp::Named("phi") = phi,
-                              Rcpp::Named("penalty") = penalty, Rcpp::Named("lambda") = lambda,
-                              Rcpp::Named("tau") = tau, Rcpp::Named("IteTightening") = iteT);
+  if (tau <= 0) {
+    Rcpp::List listILAMM = ncvxReg(X, Y, lambda, "Lasso", phi0, gamma, epsilon_c, epsilon_t, iteMax, 
+                                   intercept, true);
+    arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
+    arma::vec res = Y - X * betaLasso;
+    double mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
+    tau = mad * std::sqrt((long double)(n / std::log(n * d)));
   }
+  arma::vec beta = arma::zeros(d + 1);
+  arma::vec betaNew = arma::zeros(d + 1);
+  // Contraction
+  arma::vec Lambda = cmptLambda(beta, lambda, penalty);
+  double phi = phi0;
+  int ite = 0;
+  Rcpp::List listLAMM;
+  while (ite <= iteMax) {
+    ite++;
+    listLAMM = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
+    betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
+    phi = listLAMM["phi"];
+    phi = std::max(phi0, phi / gamma);
+    if (arma::norm(betaNew - beta, "inf") <= epsilon_c) {
+      break;
+    }
+    beta = betaNew;
+  }
+  int iteT = 0;
+  // Tightening
+  if (penalty != "Lasso") {
+    arma::vec beta0 = arma::zeros(d + 1);
+    while (iteT <= iteMax) {
+      iteT++;
+      beta = betaNew;
+      beta0 = betaNew;
+      Lambda = cmptLambda(beta, lambda, penalty);
+      phi = phi0;
+      ite = 0;
+      while (ite <= iteMax) {
+        ite++;
+        listLAMM  = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
+        betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
+        phi = listLAMM["phi"];
+        phi = std::max(phi0, phi / gamma);
+        if (arma::norm(betaNew - beta, "inf") <= epsilon_t) {
+          break;
+        }
+        beta = betaNew;
+      }
+      if (arma::norm(betaNew - beta0, "inf") <= epsilon_t) {
+        break;
+      }
+    }
+  }
+  return Rcpp::List::create(Rcpp::Named("beta") = betaNew, Rcpp::Named("phi") = phi,
+                            Rcpp::Named("penalty") = penalty, Rcpp::Named("lambda") = lambda,
+                            Rcpp::Named("tau") = tau, Rcpp::Named("IteTightening") = iteT);
 }
 
 arma::uvec getIndex(const int n, const int low, const int up) {
@@ -444,7 +373,7 @@ arma::vec tauConst(int n) {
   return rst;
 }
 
-//' The function performs k-fold cross validation for (high-dimensional) regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented via I-LAMM algorithm.
+//' The function performs k-fold cross validation for (high-dimensional) regularized regression with non-convex penalties: Lasso, SCAD and MCP.
 //'
 //' The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. The sequence of \eqn{\lambda}'s has a default setting but it can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
 //'
@@ -491,12 +420,12 @@ arma::vec tauConst(int n) {
 //' fit$lambdaMin
 //' @export
 // [[Rcpp::export]]
-Rcpp::List cvNcvxReg(arma::mat& X, const arma::vec& Y,
-                    Rcpp::Nullable<Rcpp::NumericVector> lSeq = R_NilValue, int nlambda = 30,
-                    const std::string penalty = "SCAD", const double phi0 = 0.001,
-                    const double gamma = 1.5, const double epsilon_c = 0.001,
-                    const double epsilon_t = 0.001, const int iteMax = 500, int nfolds = 3,
-                    const bool intercept = false, const bool itcpIncluded = false) {
+Rcpp::List cvNcvxReg(arma::mat X, const arma::vec& Y,
+                     Rcpp::Nullable<Rcpp::NumericVector> lSeq = R_NilValue, int nlambda = 30,
+                     const std::string penalty = "SCAD", const double phi0 = 0.001,
+                     const double gamma = 1.5, const double epsilon_c = 0.001,
+                     const double epsilon_t = 0.001, const int iteMax = 500, int nfolds = 3,
+                     const bool intercept = false, const bool itcpIncluded = false) {
   if (!itcpIncluded) {
     arma::mat XX(X.n_rows, X.n_cols + 1);
     XX.cols(1, X.n_cols) = X;
@@ -530,20 +459,150 @@ Rcpp::List cvNcvxReg(arma::mat& X, const arma::vec& Y,
       up = (j == (nfolds - 1)) ? (n - 1) : ((j + 1) * size - 1);
       idx = getIndex(n, low, up);
       idxComp = getIndexComp(n, low, up);
-      listILAMM = ncvxReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i), penalty,
-                                     phi0, gamma, epsilon_c, epsilon_t, iteMax, intercept, true);
+      listILAMM = ncvxReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i), penalty, phi0, gamma, 
+                          epsilon_c, epsilon_t, iteMax, intercept, true);
       betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
       YPred.rows(idx) = X.rows(idx) * betaHat;
     }
     mse(i) = arma::norm(Y - YPred, 2);
   }
   arma::uword cvIdx = mse.index_min();
-  listILAMM = ncvxReg(X, Y, lambdaSeq(cvIdx), penalty, phi0, gamma, epsilon_c,
-                                 epsilon_t, iteMax, intercept, true);
+  listILAMM = ncvxReg(X, Y, lambdaSeq(cvIdx), penalty, phi0, gamma, epsilon_c, epsilon_t, iteMax, 
+                      intercept, true);
   arma::vec beta = Rcpp::as<arma::vec>(listILAMM["beta"]);
   return Rcpp::List::create(Rcpp::Named("beta") = beta, Rcpp::Named("penalty") = penalty,
                             Rcpp::Named("lambdaSeq") = lambdaSeq, Rcpp::Named("mse") = mse,
                             Rcpp::Named("lambdaMin") = lambdaSeq(cvIdx), Rcpp::Named("nfolds") = nfolds);
+}
+
+//' The function performs k-fold cross validation for (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP.
+//'
+//' The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. The sequence of \eqn{\lambda}'s and \eqn{\tau}'s have default settings but they can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
+//'
+//' @title K-fold cross validation for non-convex regularized Huber regression
+//' @param X An \eqn{n} by \eqn{d} design matrix with each row being a sample and each column being a variable, either low-dimensional data (\eqn{d \le n}) or high-dimensional data (\eqn{d > n}) are allowed.
+//' @param Y A continuous response vector with length \eqn{n}.
+//' @param lSeq Sequence of tuning parameter of regularized regression \eqn{\lambda}, every element should be positive. If it's not specified, the default sequence is generated in this way: define \eqn{\lambda_max = max(|Y^T X|) / n}, and \eqn{\lambda_min = 0.01 * \lambda_max}, then \code{lseq} is a sequence from \eqn{\lambda_max} to \eqn{\lambda_min} that decreases uniformly on log scale.
+//' @param nlambda Number of \eqn{\lambda} to generate the default sequence \code{lSeq}. It's not necessary if \code{lSeq} is specified. The default value is 30.
+//' @param penalty Type of non-convex penalties with default setting "SCAD", possible choices are: "Lasso", "SCAD" and "MCP".
+//' @param tSeq Sequence of robustness parameter of Huber loss \eqn{\tau}, every element should be positive. If it's not specified, the default sequence is generated in this way: define \eqn{R} as the residual from Lasso by fitting \code{cvNcvxReg} with \code{lSeq}, and \eqn{\sigma_MAD = median(|R - median(R)|) / \Phi^(-1)(3/4)} is the median absolute deviation estimator, then \code{tSeq} = \eqn{2^j * \sigma_MAD \sqrt(n / log(nd))}, where \eqn{j} are integers from -\code{ntau}/2 to \code{ntau}/2.
+//' @param ntau Number of \eqn{\tau} to generate the default sequence \code{tSeq}. It's not necessary if \code{tSeq} is specified. The default value is 5.
+//' @param phi0 The initial value of the isotropic parameter \eqn{\phi} in I-LAMM algorithm. The defalut value is 0.001.
+//' @param gamma The inflation parameter in I-LAMM algorithm, in each iteration of I-LAMM, we will inflate \eqn{\phi} by \eqn{\gamma}. The defalut value is 1.5.
+//' @param epsilon_c The tolerance level for contraction stage, iteration of contraction will stop when \eqn{||\beta_new - \beta_old||_2 / \sqrt(d + 1) < \epsilon_c}. The defalut value is 1e-4.
+//' @param epsilon_t The tolerance level for tightening stage, iteration of tightening will stop when \eqn{||\beta_new - \beta_old||_2 / \sqrt(d + 1) < \epsilon_t}. The defalut value is 1e-4.
+//' @param iteMax The maximal number of iteration in either contraction or tightening stage, if this number is reached, the convergence of I-LAMM is failed. The defalut value is 500.
+//' @param nfolds The number of folds to conduct cross validation, values that are greater than 10 are not recommended, and it'll be modified to 10 if the input is greater than 10. The default value is 3.
+//' @param intercept Boolean value indicating whether an intercept term should be included into the model. The default setting is \code{FALSE}.
+//' @param itcpIncluded Boolean value indicating whether a column of 1's has been included in the design matrix \eqn{X}. The default setting is \code{FALSE}.
+//' @return A list including the following terms will be returned:
+//' \itemize{
+//' \item \code{beta} The estimated \eqn{\beta} with \eqn{\lambda} and \eqn{\tau} determined by cross validation, it's a vector with length d + 1, with the first one being the value of intercept (0 if \code{intercept = FALSE}).
+//' \item \code{penalty} The type of penalty.
+//' \item \code{lambdaSeq} The sequence of \eqn{\lambda}'s for cross validation.
+//' \item \code{tauSeq} The sequence of \eqn{\tau}'s for cross validation.
+//' \item \code{mse} The mean squared error from cross validation, it's a matrix with dimension \code{nlambda} by \code{ntau}.
+//' \item \code{lambdaMin} The value of \eqn{\lambda} in \code{lSeq} that minimized \code{mse}.
+//' \item \code{tauMin} The value of \eqn{\tau} in \code{tSeq} that minimized \code{mse}.
+//' \item \code{nfolds} The number of folds for cross validation.
+//' }
+//' @author Xiaoou Pan, Qiang Sun, Wen-Xin Zhou
+//' @references Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841.
+//' @seealso \code{\link{ncvxHuberReg}}
+//' @seealso \code{\link{tfNcvxHuberReg}}
+//' @examples
+//' n = 50
+//' d = 100
+//' set.seed(2018)
+//' X = matrix(rnorm(n * d), n, d)
+//' beta = c(rep(2, 3), rep(0, d - 3))
+//' Y = X %*% beta + rlnorm(n, 0, 1.2) - exp(1.2^2 / 2)
+//' # Fit SCAD without intercept, with lambda and tau determined by 3-folds cross validation
+//' fit = cvNcvxHuberReg(X, Y)
+//' fit$beta
+//' fit$lambdaMin
+//' fit$tauMin
+//' # Fit MCP with intercept, with lambda and tau determined by 3-folds cross validation
+//' fit = cvNcvxHuberReg(X, Y, penalty = "MCP", intercept = TRUE)
+//' fit$beta
+//' fit$lambdaMin
+//' fit$tauMin
+//' @export
+// [[Rcpp::export]]
+Rcpp::List cvNcvxHuberReg(arma::mat& X, const arma::vec& Y,
+                         Rcpp::Nullable<Rcpp::NumericVector> lSeq = R_NilValue, int nlambda = 30,
+                         const std::string penalty = "SCAD",
+                         Rcpp::Nullable<Rcpp::NumericVector> tSeq = R_NilValue, int ntau = 5,
+                         const double phi0 = 0.001, const double gamma = 1.5,
+                         const double epsilon_c = 0.001, const double epsilon_t = 0.001,
+                         const int iteMax = 500, int nfolds = 3, const bool intercept = false,
+                         const bool itcpIncluded = false) {
+  if (!itcpIncluded) {
+    arma::mat XX(X.n_rows, X.n_cols + 1);
+    XX.cols(1, X.n_cols) = X;
+    XX.col(0) = arma::ones(X.n_rows);
+    X = XX;
+  }
+  int n = Y.size();
+  int d = X.n_cols - 1;
+  if (nfolds > 10 || nfolds > n) {
+    nfolds = n < 10 ? n : 10;
+  }
+  int size = n / nfolds;
+  arma::vec lambdaSeq = arma::vec();
+  if (lSeq.isNotNull()) {
+    lambdaSeq = Rcpp::as<arma::vec>(lSeq);
+    nlambda = lambdaSeq.size();
+  } else {
+    double lambdaMax = arma::max(arma::abs(Y.t() * X)) / n;
+    double lambdaMin = 0.01 * lambdaMax;
+    lambdaSeq = exp(arma::linspace(std::log((long double)lambdaMin), std::log((long double)lambdaMax), 
+                                   nlambda));
+  }
+  arma::vec tauSeq = arma::vec();
+  Rcpp::List listILAMM;
+  if (tSeq.isNotNull()) {
+    tauSeq = Rcpp::as<arma::vec>(tSeq);
+    ntau = tauSeq.size();
+  } else {
+    listILAMM = cvNcvxReg(X, Y, lSeq, nlambda, "Lasso", phi0, gamma, epsilon_c, epsilon_t, iteMax, 
+                          nfolds, intercept, true);
+    arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
+    arma::vec res = Y - X * betaLasso;
+    double mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
+    arma::vec tauCon = tauConst(ntau);
+    tauSeq = mad * std::sqrt((long double)(n / std::log(n * d))) * tauCon;
+  }
+  arma::vec YPred(n);
+  arma::vec betaHat(d + 1);
+  arma::mat mse(nlambda, ntau);
+  int low, up;
+  arma::uvec idx, idxComp;
+  for (int i = 0; i < nlambda; i++) {
+    for (int k = 0; k < ntau; k++) {
+      for (int j = 0; j < nfolds; j++) {
+        low = j * size;
+        up = (j == (nfolds - 1)) ? (n - 1) : ((j + 1) * size - 1);
+        idx = getIndex(n, low, up);
+        idxComp = getIndexComp(n, low, up);
+        listILAMM = ncvxHuberReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i), penalty, tauSeq(k), 
+                                 phi0, gamma, epsilon_c, epsilon_t, iteMax, intercept, true);
+        betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
+        YPred.rows(idx) = X.rows(idx) * betaHat;
+      }
+      mse(i, k) = arma::norm(Y - YPred, 2);
+    }
+  }
+  arma::uword cvIdx = mse.index_min();
+  arma::uword idxLambda = cvIdx - (cvIdx / nlambda) * nlambda;
+  arma::uword idxTau = cvIdx / nlambda;
+  listILAMM = ncvxHuberReg(X, Y, lambdaSeq(idxLambda), penalty, tauSeq(idxTau), phi0, gamma, epsilon_c, 
+                           epsilon_t, iteMax, intercept, true);
+  arma::vec beta = Rcpp::as<arma::vec>(listILAMM["beta"]);
+  return Rcpp::List::create(Rcpp::Named("beta") = beta, Rcpp::Named("penalty") = penalty,
+                            Rcpp::Named("lambdaSeq") = lambdaSeq, Rcpp::Named("tauSeq") = tauSeq,
+                            Rcpp::Named("mse") = mse, Rcpp::Named("lambdaMin") = lambdaSeq(idxLambda),
+                            Rcpp::Named("tauMin") = tauSeq(idxTau), Rcpp::Named("nfolds") = nfolds);
 }
 
 double f1(const double x, const arma::vec& resSq, const int n) {
@@ -610,18 +669,82 @@ double pairPred(const arma::mat& X, const arma::vec& Y, const arma::vec& beta) {
   return arma::sum(arma::square(pairY - predY));
 }
 
-//' The function performs k-fold cross validation for (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented via I-LAMM algorithm.
+Rcpp::List ncvxHuberTf(const arma::mat& X, const arma::vec& Y, const double lambda, 
+                       const std::string penalty = "SCAD", const double phi0 = 0.001,
+                       const double gamma = 1.5, const double epsilon_c = 0.001,
+                       const double epsilon_t = 0.001, const int iteMax = 500,
+                       const bool intercept = false, double tfConst = 2.5) {
+  int d = X.n_cols - 1;
+  Rcpp::List listILAMM = ncvxReg(X, Y, lambda, "Lasso", phi0, gamma, epsilon_c, epsilon_t, iteMax, 
+                                 intercept, true);
+  arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
+  arma::vec res = Y - X * betaLasso;
+  double mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
+  double tau = tfConst * mad;
+  arma::vec beta = arma::zeros(d + 1);
+  arma::vec betaNew = arma::zeros(d + 1);
+  // Contraction
+  arma::vec Lambda = cmptLambda(beta, lambda, penalty);
+  double phi = phi0;
+  int ite = 0;
+  Rcpp::List listLAMM;
+  while (ite <= iteMax) {
+    ite++;
+    listLAMM = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
+    betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
+    phi = listLAMM["phi"];
+    phi = std::max(phi0, phi / gamma);
+    if (arma::norm(betaNew - beta, "inf") <= epsilon_c) {
+      break;
+    }
+    beta = betaNew;
+    res = Y - X * beta;
+    mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
+    tau = tfConst * mad;
+  }
+  int iteT = 0;
+  // Tightening
+  if (penalty != "Lasso") {
+    arma::vec beta0 = arma::zeros(d + 1);
+    while (iteT <= iteMax) {
+      iteT++;
+      beta = betaNew;
+      beta0 = betaNew;
+      Lambda = cmptLambda(beta, lambda, penalty);
+      phi = phi0;
+      ite = 0;
+      while (ite <= iteMax) {
+        ite++;
+        listLAMM  = LAMM(X, Y, Lambda, beta, phi, "Huber", tau, gamma, intercept);
+        betaNew = Rcpp::as<arma::vec>(listLAMM["beta"]);
+        phi = listLAMM["phi"];
+        phi = std::max(phi0, phi / gamma);
+        if (arma::norm(betaNew - beta, "inf") <= epsilon_t) {
+          break;
+        }
+        beta = betaNew;
+        res = Y - X * beta;
+        mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
+        tau = tfConst * mad;
+      }
+      if (arma::norm(betaNew - beta0, "inf") <= epsilon_t) {
+        break;
+      }
+    }
+  }
+  return Rcpp::List::create(Rcpp::Named("beta") = betaNew, Rcpp::Named("tau") = tau);
+}
+
+//' The function performs k-fold cross validation for (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP. The robustness parameter tau is calibrated via a tuning-free principle.
 //'
-//' The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. The sequence of \eqn{\lambda}'s and \eqn{\tau}'s have default settings but they can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
+//' The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. The sequence of \eqn{\lambda}'s have default settings but they can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
 //'
-//' @title K-fold cross validation for non-convex regularized Huber regression
+//' @title Tuning-free non-convex regularized Huber regression
 //' @param X An \eqn{n} by \eqn{d} design matrix with each row being a sample and each column being a variable, either low-dimensional data (\eqn{d \le n}) or high-dimensional data (\eqn{d > n}) are allowed.
 //' @param Y A continuous response vector with length \eqn{n}.
 //' @param lSeq Sequence of tuning parameter of regularized regression \eqn{\lambda}, every element should be positive. If it's not specified, the default sequence is generated in this way: define \eqn{\lambda_max = max(|Y^T X|) / n}, and \eqn{\lambda_min = 0.01 * \lambda_max}, then \code{lseq} is a sequence from \eqn{\lambda_max} to \eqn{\lambda_min} that decreases uniformly on log scale.
 //' @param nlambda Number of \eqn{\lambda} to generate the default sequence \code{lSeq}. It's not necessary if \code{lSeq} is specified. The default value is 30.
 //' @param penalty Type of non-convex penalties with default setting "SCAD", possible choices are: "Lasso", "SCAD" and "MCP".
-//' @param tSeq Sequence of robustness parameter of Huber loss \eqn{\tau}, every element should be positive. If it's not specified, the default sequence is generated in this way: define \eqn{R} as the residual from Lasso by fitting \code{cvNcvxReg} with \code{lSeq}, and \eqn{\sigma_MAD = median(|R - median(R)|) / \Phi^(-1)(3/4)} is the median absolute deviation estimator, then \code{tSeq} = \eqn{2^j * \sigma_MAD \sqrt(n / log(nd))}, where \eqn{j} are integers from -\code{ntau}/2 to \code{ntau}/2.
-//' @param ntau Number of \eqn{\tau} to generate the default sequence \code{tSeq}. It's not necessary if \code{tSeq} is specified. The default value is 5.
 //' @param phi0 The initial value of the isotropic parameter \eqn{\phi} in I-LAMM algorithm. The defalut value is 0.001.
 //' @param gamma The inflation parameter in I-LAMM algorithm, in each iteration of I-LAMM, we will inflate \eqn{\phi} by \eqn{\gamma}. The defalut value is 1.5.
 //' @param epsilon_c The tolerance level for contraction stage, iteration of contraction will stop when \eqn{||\beta_new - \beta_old||_2 / \sqrt(d + 1) < \epsilon_c}. The defalut value is 1e-4.
@@ -630,23 +753,21 @@ double pairPred(const arma::mat& X, const arma::vec& Y, const arma::vec& beta) {
 //' @param nfolds The number of folds to conduct cross validation, values that are greater than 10 are not recommended, and it'll be modified to 10 if the input is greater than 10. The default value is 3.
 //' @param intercept Boolean value indicating whether an intercept term should be included into the model. The default setting is \code{FALSE}.
 //' @param itcpIncluded Boolean value indicating whether a column of 1's has been included in the design matrix \eqn{X}. The default setting is \code{FALSE}.
-//' @param tf Boolean value indicating whether a tuning-free principle is applied to calibrate the value of \code{tau}. The default setting is \code{FALSE}.
-//' @param constTau The constant used in tuning-free procedure to update \code{tau}. The default value is 2.
+//' @param tfConst The constant used in tuning-free procedure to update \code{tau}. The default value is 2.5.
 //' @return A list including the following terms will be returned:
 //' \itemize{
-//' \item \code{beta} The estimated \eqn{\beta} with \eqn{\lambda} and \eqn{\tau} determined by cross validation, it's a vector with length d + 1, with the first one being the value of intercept (0 if \code{intercept = FALSE}).
+//' \item \code{beta} The estimated \eqn{\beta} with \eqn{\lambda} determined by cross validation and \eqn{\tau} determined by a tuning-free principle, it's a vector with length d + 1, with the first one being the value of intercept (0 if \code{intercept = FALSE}).
 //' \item \code{penalty} The type of penalty.
 //' \item \code{lambdaSeq} The sequence of \eqn{\lambda}'s for cross validation.
-//' \item \code{tauSeq} The sequence of \eqn{\tau}'s for cross validation.
-//' \item \code{mse} The mean squared error from cross validation, it's a matrix with dimension \code{nlambda} by \code{ntau}.
 //' \item \code{lambdaMin} The value of \eqn{\lambda} in \code{lSeq} that minimized \code{mse}.
-//' \item \code{tauMin} The value of \eqn{\tau} in \code{tSeq} that minimized \code{mse}.
+//' \item \code{tau} The value of \eqn{\tau} produced by a tuning-free procedure.
 //' \item \code{nfolds} The number of folds for cross validation.
 //' }
 //' @author Xiaoou Pan, Qiang Sun, Wen-Xin Zhou
 //' @references Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841.
 //' @references Wang, L., Zheng, C., Zhou, W. and Zhou, W.-X. (2018). A New Principle for Tuning-Free Huber Regression. Preprint.
 //' @seealso \code{\link{ncvxHuberReg}}
+//' @seealso \code{\link{cvNcvxHuberReg}}
 //' @examples
 //' n = 50
 //' d = 100
@@ -654,27 +775,25 @@ double pairPred(const arma::mat& X, const arma::vec& Y, const arma::vec& beta) {
 //' X = matrix(rnorm(n * d), n, d)
 //' beta = c(rep(2, 3), rep(0, d - 3))
 //' Y = X %*% beta + rlnorm(n, 0, 1.2) - exp(1.2^2 / 2)
-//' # Fit SCAD without intercept, with lambda and tau determined by 3-folds cross validation
-//' fit = cvNcvxHuberReg(X, Y)
+//' # Fit SCAD without intercept, with lambda determined by 3-folds cross validation and tau determined by a tuning-free principle.
+//' fit = tfNcvxHuberReg(X, Y)
 //' fit$beta
 //' fit$lambdaMin
-//' fit$tauMin
-//' # Fit MCP with intercept, with lambda and tau determined by 3-folds cross validation
-//' fit = cvNcvxHuberReg(X, Y, penalty = "MCP", intercept = TRUE)
+//' fit$tau
+//' # Fit MCP with intercept, with lambda determined by 3-folds cross validation and tau determined by a tuning-free principle.
+//' fit = tfNcvxHuberReg(X, Y, penalty = "MCP", intercept = TRUE)
 //' fit$beta
 //' fit$lambdaMin
-//' fit$tauMin
+//' fit$tau
 //' @export
 // [[Rcpp::export]]
-Rcpp::List cvNcvxHuberReg(arma::mat& X, const arma::vec& Y,
-                  Rcpp::Nullable<Rcpp::NumericVector> lSeq = R_NilValue, int nlambda = 30,
-                  const std::string penalty = "SCAD",
-                  Rcpp::Nullable<Rcpp::NumericVector> tSeq = R_NilValue, int ntau = 5,
-                  const double phi0 = 0.001, const double gamma = 1.5,
-                  const double epsilon_c = 0.001, const double epsilon_t = 0.001,
-                  const int iteMax = 500, int nfolds = 3, const bool intercept = false,
-                  const bool itcpIncluded = false, const bool tf = false, 
-                  const double constTau = 2) {
+Rcpp::List tfNcvxHuberReg(arma::mat X, const arma::vec& Y,
+                          Rcpp::Nullable<Rcpp::NumericVector> lSeq = R_NilValue, int nlambda = 30,
+                          const std::string penalty = "SCAD", const double phi0 = 0.001, 
+                          const double gamma = 1.5, const double epsilon_c = 0.001, 
+                          const double epsilon_t = 0.001, const int iteMax = 500, int nfolds = 3, 
+                          const bool intercept = false, const bool itcpIncluded = false,
+                          const double tfConst = 2.5) {
   if (!itcpIncluded) {
     arma::mat XX(X.n_rows, X.n_cols + 1);
     XX.cols(1, X.n_cols) = X;
@@ -694,106 +813,53 @@ Rcpp::List cvNcvxHuberReg(arma::mat& X, const arma::vec& Y,
   } else {
     double lambdaMax = arma::max(arma::abs(Y.t() * X)) / n;
     double lambdaMin = 0.01 * lambdaMax;
-    lambdaSeq = exp(arma::linspace(std::log((long double)lambdaMin),
-                    std::log((long double)lambdaMax), nlambda));
+    lambdaSeq = exp(arma::linspace(std::log((long double)lambdaMin), std::log((long double)lambdaMax), 
+                                   nlambda));
   }
-  if (!tf) {
-    arma::vec tauSeq = arma::vec();
-    Rcpp::List listILAMM;
-    if (tSeq.isNotNull()) {
-      tauSeq = Rcpp::as<arma::vec>(tSeq);
-      ntau = tauSeq.size();
-    } else {
-      listILAMM = cvNcvxReg(X, Y, lSeq, nlambda, "Lasso", phi0, gamma, epsilon_c,
-                                       epsilon_t, iteMax, nfolds, intercept, true);
-      arma::vec betaLasso = Rcpp::as<arma::vec>(listILAMM["beta"]);
-      arma::vec res = Y - X * betaLasso;
-      double mad = arma::median(arma::abs(res - arma::median(res))) / 0.6744898;
-      arma::vec tauCon = tauConst(ntau);
-      tauSeq = mad * std::sqrt((long double)(n / std::log(n * d))) * tauCon;
-    }
+  arma::vec betaHat(d + 1);
+  int low, up;
+  arma::uvec idx, idxComp;
+  Rcpp::List listILAMM;
+  if (!intercept) {
     arma::vec YPred(n);
-    arma::vec betaHat(d + 1);
-    arma::mat mse(nlambda, ntau);
-    int low, up;
-    arma::uvec idx, idxComp;
-    for (int i = 0; i < nlambda; i++) {
-      for (int k = 0; k < ntau; k++) {
-        for (int j = 0; j < nfolds; j++) {
-          low = j * size;
-          up = (j == (nfolds - 1)) ? (n - 1) : ((j + 1) * size - 1);
-          idx = getIndex(n, low, up);
-          idxComp = getIndexComp(n, low, up);
-          listILAMM = ncvxHuberReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i),
-                                              penalty, tauSeq(k), phi0, gamma, epsilon_c, epsilon_t,
-                                              iteMax, intercept, true, tf, constTau);
-          betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
-          YPred.rows(idx) = X.rows(idx) * betaHat;
-        }
-        mse(i, k) = arma::norm(Y - YPred, 2);
-      }
-    }
-    arma::uword cvIdx = mse.index_min();
-    arma::uword idxLambda = cvIdx - (cvIdx / nlambda) * nlambda;
-    arma::uword idxTau = cvIdx / nlambda;
-    listILAMM = ncvxHuberReg(X, Y, lambdaSeq(idxLambda), penalty, tauSeq(idxTau), phi0,
-                                        gamma, epsilon_c, epsilon_t, iteMax, intercept, true, tf,
-                                        constTau);
-    arma::vec beta = Rcpp::as<arma::vec>(listILAMM["beta"]);
-    return Rcpp::List::create(Rcpp::Named("beta") = beta, Rcpp::Named("penalty") = penalty,
-                              Rcpp::Named("lambdaSeq") = lambdaSeq, Rcpp::Named("tauSeq") = tauSeq,
-                              Rcpp::Named("mse") = mse, Rcpp::Named("lambdaMin") = lambdaSeq(idxLambda),
-                              Rcpp::Named("tauMin") = tauSeq(idxTau), Rcpp::Named("nfolds") = nfolds);
-  } else if (!intercept) {
-    arma::vec YPred(n);
-    arma::vec betaHat(d + 1);
     arma::vec mse(nlambda);
-    int low, up;
-    arma::uvec idx, idxComp;
-    Rcpp::List listILAMM;
     for (int i = 0; i < nlambda; i++) {
       for (int j = 0; j < nfolds; j++) {
         low = j * size;
         up = (j == (nfolds - 1)) ? (n - 1) : ((j + 1) * size - 1);
         idx = getIndex(n, low, up);
         idxComp = getIndexComp(n, low, up);
-        listILAMM = ncvxHuberReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i),
-                                 penalty, -1, phi0, gamma, epsilon_c, epsilon_t,
-                                 iteMax, intercept, true, tf, constTau);
+        listILAMM = ncvxHuberTf(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i), penalty, phi0, 
+                                gamma, epsilon_c, epsilon_t, iteMax, intercept, tfConst);
         betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
         YPred.rows(idx) = X.rows(idx) * betaHat;
       }
       mse(i) = arma::norm(Y - YPred, 2);
     }
     arma::uword cvIdx = mse.index_min();
-    listILAMM = ncvxHuberReg(X, Y, lambdaSeq(cvIdx), penalty, -1, phi0, gamma, epsilon_c, 
-                             epsilon_t, iteMax, intercept, true, tf, constTau);
+    listILAMM = ncvxHuberTf(X, Y, lambdaSeq(cvIdx), penalty, phi0, gamma, epsilon_c, epsilon_t, 
+                            iteMax, intercept, tfConst);
     arma::vec beta = Rcpp::as<arma::vec>(listILAMM["beta"]);
     return Rcpp::List::create(Rcpp::Named("beta") = beta, Rcpp::Named("penalty") = penalty,
                               Rcpp::Named("lambdaSeq") = lambdaSeq, Rcpp::Named("lambdaMin") = lambdaSeq(cvIdx),
                               Rcpp::Named("tau") = listILAMM["tau"], Rcpp::Named("nfolds") = nfolds);
   } else {
-    arma::vec betaHat(d + 1);
     arma::vec mse = arma::zeros(nlambda);
-    int low, up;
-    arma::uvec idx, idxComp;
-    Rcpp::List listILAMM;
     for (int i = 0; i < nlambda; i++) {
       for (int j = 0; j < nfolds; j++) {
         low = j * size;
         up = (j == (nfolds - 1)) ? (n - 1) : ((j + 1) * size - 1);
         idx = getIndex(n, low, up);
         idxComp = getIndexComp(n, low, up);
-        listILAMM = ncvxHuberReg(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i),
-                                            penalty, -1, phi0, gamma, epsilon_c, epsilon_t,
-                                            iteMax, intercept, true, tf, constTau);
+        listILAMM = ncvxHuberTf(X.rows(idxComp), Y.rows(idxComp), lambdaSeq(i), penalty, phi0, 
+                                gamma, epsilon_c, epsilon_t, iteMax, intercept, tfConst);
         betaHat = Rcpp::as<arma::vec>(listILAMM["beta"]);
         mse(i) += pairPred(X.rows(idx), Y.rows(idx), betaHat);
       }
     }
     arma::uword cvIdx = mse.index_min();
-    listILAMM = ncvxHuberReg(X, Y, lambdaSeq(cvIdx), penalty, -1, phi0, gamma, epsilon_c, 
-                                        epsilon_t, iteMax, intercept, true, tf, constTau);
+    listILAMM = ncvxHuberTf(X, Y, lambdaSeq(cvIdx), penalty, phi0, gamma, epsilon_c, epsilon_t, 
+                            iteMax, intercept, tfConst);
     arma::vec beta = Rcpp::as<arma::vec>(listILAMM["beta"]);
     beta(0) = huberMean(Y - X.cols(1, d) * beta.rows(1, d));
     return Rcpp::List::create(Rcpp::Named("beta") = beta, Rcpp::Named("penalty") = penalty,

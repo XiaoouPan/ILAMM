@@ -6,8 +6,7 @@
 \usage{
 ncvxHuberReg(X, Y, lambda = -1, penalty = "SCAD", tau = -1,
   phi0 = 0.001, gamma = 1.5, epsilon_c = 0.001, epsilon_t = 0.001,
-  iteMax = 500L, intercept = FALSE, itcpIncluded = FALSE,
-  tf = FALSE, constTau = 2)
+  iteMax = 500L, intercept = FALSE, itcpIncluded = FALSE)
 }
 \arguments{
 \item{X}{An \eqn{n} by \eqn{d} design matrix with each row being a sample and each column being a variable, either low-dimensional data (\eqn{d \le n}) or high-dimensional data (\eqn{d > n}) are allowed.}
@@ -33,10 +32,6 @@ ncvxHuberReg(X, Y, lambda = -1, penalty = "SCAD", tau = -1,
 \item{intercept}{Boolean value indicating whether an intercept term should be included into the model. The default setting is \code{FALSE}.}
 
 \item{itcpIncluded}{Boolean value indicating whether a column of 1's has been included in the design matrix \eqn{X}. The default setting is \code{FALSE}.}
-
-\item{tf}{Boolean value indicating whether a tuning-free principle is applied to calibrate the value of \code{tau}. The default setting is \code{FALSE}.}
-
-\item{constTau}{The constant used in tuning-free procedure to update \code{tau}. The default value is 2.}
 }
 \value{
 A list including the following terms will be returned:
@@ -50,7 +45,7 @@ A list including the following terms will be returned:
 }
 }
 \description{
-The function fits (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP, and it's implemented via I-LAMM algorithm.
+The function fits (high-dimensional) Huber regularized regression with non-convex penalties: Lasso, SCAD and MCP.
 }
 \details{
 The observed data are \eqn{(Y, X)}, where \eqn{Y} is an \eqn{n}-dimensional response vector and \eqn{X} is an \eqn{n} by \eqn{d} design matrix. We assume that \eqn{Y} depends on \eqn{X} through a linear model \eqn{Y = X \beta + \epsilon}, where \eqn{\epsilon} is an \eqn{n}-dimensional noise vector whose distribution can be asymmetrix and/or heavy-tailed. The design matrix \eqn{X} can be either high-dimensional or low-dimensional. Tunning parameters \eqn{\lambda} and \eqn{\tau} have default settings but they can be user-specified. All the arguments except for \eqn{X} and \eqn{Y} have default settings.
@@ -71,8 +66,6 @@ fit$beta
 }
 \references{
 Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841.
-
-Wang, L., Zheng, C., Zhou, W. and Zhou, W.-X. (2018). A New Principle for Tuning-Free Huber Regression. Preprint.
 }
 \seealso{
 \code{\link{cvNcvxHuberReg}}

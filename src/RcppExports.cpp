@@ -28,15 +28,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // ncvxHuberReg
-Rcpp::List ncvxHuberReg(arma::mat X, const arma::vec& Y, double lambda, std::string penalty, double tau, const double phi0, const double gamma, const double epsilon_c, const double epsilon_t, const int iteMax, const bool intercept, const bool itcpIncluded, const bool tf, const double constTau);
-RcppExport SEXP _ILAMM_ncvxHuberReg(SEXP XSEXP, SEXP YSEXP, SEXP lambdaSEXP, SEXP penaltySEXP, SEXP tauSEXP, SEXP phi0SEXP, SEXP gammaSEXP, SEXP epsilon_cSEXP, SEXP epsilon_tSEXP, SEXP iteMaxSEXP, SEXP interceptSEXP, SEXP itcpIncludedSEXP, SEXP tfSEXP, SEXP constTauSEXP) {
+Rcpp::List ncvxHuberReg(arma::mat X, const arma::vec& Y, double lambda, const std::string penalty, double tau, const double phi0, const double gamma, const double epsilon_c, const double epsilon_t, const int iteMax, const bool intercept, const bool itcpIncluded);
+RcppExport SEXP _ILAMM_ncvxHuberReg(SEXP XSEXP, SEXP YSEXP, SEXP lambdaSEXP, SEXP penaltySEXP, SEXP tauSEXP, SEXP phi0SEXP, SEXP gammaSEXP, SEXP epsilon_cSEXP, SEXP epsilon_tSEXP, SEXP iteMaxSEXP, SEXP interceptSEXP, SEXP itcpIncludedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type Y(YSEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< std::string >::type penalty(penaltySEXP);
+    Rcpp::traits::input_parameter< const std::string >::type penalty(penaltySEXP);
     Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
     Rcpp::traits::input_parameter< const double >::type phi0(phi0SEXP);
     Rcpp::traits::input_parameter< const double >::type gamma(gammaSEXP);
@@ -45,19 +45,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int >::type iteMax(iteMaxSEXP);
     Rcpp::traits::input_parameter< const bool >::type intercept(interceptSEXP);
     Rcpp::traits::input_parameter< const bool >::type itcpIncluded(itcpIncludedSEXP);
-    Rcpp::traits::input_parameter< const bool >::type tf(tfSEXP);
-    Rcpp::traits::input_parameter< const double >::type constTau(constTauSEXP);
-    rcpp_result_gen = Rcpp::wrap(ncvxHuberReg(X, Y, lambda, penalty, tau, phi0, gamma, epsilon_c, epsilon_t, iteMax, intercept, itcpIncluded, tf, constTau));
+    rcpp_result_gen = Rcpp::wrap(ncvxHuberReg(X, Y, lambda, penalty, tau, phi0, gamma, epsilon_c, epsilon_t, iteMax, intercept, itcpIncluded));
     return rcpp_result_gen;
 END_RCPP
 }
 // cvNcvxReg
-Rcpp::List cvNcvxReg(arma::mat& X, const arma::vec& Y, Rcpp::Nullable<Rcpp::NumericVector> lSeq, int nlambda, const std::string penalty, const double phi0, const double gamma, const double epsilon_c, const double epsilon_t, const int iteMax, int nfolds, const bool intercept, const bool itcpIncluded);
+Rcpp::List cvNcvxReg(arma::mat X, const arma::vec& Y, Rcpp::Nullable<Rcpp::NumericVector> lSeq, int nlambda, const std::string penalty, const double phi0, const double gamma, const double epsilon_c, const double epsilon_t, const int iteMax, int nfolds, const bool intercept, const bool itcpIncluded);
 RcppExport SEXP _ILAMM_cvNcvxReg(SEXP XSEXP, SEXP YSEXP, SEXP lSeqSEXP, SEXP nlambdaSEXP, SEXP penaltySEXP, SEXP phi0SEXP, SEXP gammaSEXP, SEXP epsilon_cSEXP, SEXP epsilon_tSEXP, SEXP iteMaxSEXP, SEXP nfoldsSEXP, SEXP interceptSEXP, SEXP itcpIncludedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type Y(YSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type lSeq(lSeqSEXP);
     Rcpp::traits::input_parameter< int >::type nlambda(nlambdaSEXP);
@@ -75,8 +73,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // cvNcvxHuberReg
-Rcpp::List cvNcvxHuberReg(arma::mat& X, const arma::vec& Y, Rcpp::Nullable<Rcpp::NumericVector> lSeq, int nlambda, const std::string penalty, Rcpp::Nullable<Rcpp::NumericVector> tSeq, int ntau, const double phi0, const double gamma, const double epsilon_c, const double epsilon_t, const int iteMax, int nfolds, const bool intercept, const bool itcpIncluded, const bool tf, const double constTau);
-RcppExport SEXP _ILAMM_cvNcvxHuberReg(SEXP XSEXP, SEXP YSEXP, SEXP lSeqSEXP, SEXP nlambdaSEXP, SEXP penaltySEXP, SEXP tSeqSEXP, SEXP ntauSEXP, SEXP phi0SEXP, SEXP gammaSEXP, SEXP epsilon_cSEXP, SEXP epsilon_tSEXP, SEXP iteMaxSEXP, SEXP nfoldsSEXP, SEXP interceptSEXP, SEXP itcpIncludedSEXP, SEXP tfSEXP, SEXP constTauSEXP) {
+Rcpp::List cvNcvxHuberReg(arma::mat& X, const arma::vec& Y, Rcpp::Nullable<Rcpp::NumericVector> lSeq, int nlambda, const std::string penalty, Rcpp::Nullable<Rcpp::NumericVector> tSeq, int ntau, const double phi0, const double gamma, const double epsilon_c, const double epsilon_t, const int iteMax, int nfolds, const bool intercept, const bool itcpIncluded);
+RcppExport SEXP _ILAMM_cvNcvxHuberReg(SEXP XSEXP, SEXP YSEXP, SEXP lSeqSEXP, SEXP nlambdaSEXP, SEXP penaltySEXP, SEXP tSeqSEXP, SEXP ntauSEXP, SEXP phi0SEXP, SEXP gammaSEXP, SEXP epsilon_cSEXP, SEXP epsilon_tSEXP, SEXP iteMaxSEXP, SEXP nfoldsSEXP, SEXP interceptSEXP, SEXP itcpIncludedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -95,18 +93,41 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type nfolds(nfoldsSEXP);
     Rcpp::traits::input_parameter< const bool >::type intercept(interceptSEXP);
     Rcpp::traits::input_parameter< const bool >::type itcpIncluded(itcpIncludedSEXP);
-    Rcpp::traits::input_parameter< const bool >::type tf(tfSEXP);
-    Rcpp::traits::input_parameter< const double >::type constTau(constTauSEXP);
-    rcpp_result_gen = Rcpp::wrap(cvNcvxHuberReg(X, Y, lSeq, nlambda, penalty, tSeq, ntau, phi0, gamma, epsilon_c, epsilon_t, iteMax, nfolds, intercept, itcpIncluded, tf, constTau));
+    rcpp_result_gen = Rcpp::wrap(cvNcvxHuberReg(X, Y, lSeq, nlambda, penalty, tSeq, ntau, phi0, gamma, epsilon_c, epsilon_t, iteMax, nfolds, intercept, itcpIncluded));
+    return rcpp_result_gen;
+END_RCPP
+}
+// tfNcvxHuberReg
+Rcpp::List tfNcvxHuberReg(arma::mat X, const arma::vec& Y, Rcpp::Nullable<Rcpp::NumericVector> lSeq, int nlambda, const std::string penalty, const double phi0, const double gamma, const double epsilon_c, const double epsilon_t, const int iteMax, int nfolds, const bool intercept, const bool itcpIncluded, const double tfConst);
+RcppExport SEXP _ILAMM_tfNcvxHuberReg(SEXP XSEXP, SEXP YSEXP, SEXP lSeqSEXP, SEXP nlambdaSEXP, SEXP penaltySEXP, SEXP phi0SEXP, SEXP gammaSEXP, SEXP epsilon_cSEXP, SEXP epsilon_tSEXP, SEXP iteMaxSEXP, SEXP nfoldsSEXP, SEXP interceptSEXP, SEXP itcpIncludedSEXP, SEXP tfConstSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type lSeq(lSeqSEXP);
+    Rcpp::traits::input_parameter< int >::type nlambda(nlambdaSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type penalty(penaltySEXP);
+    Rcpp::traits::input_parameter< const double >::type phi0(phi0SEXP);
+    Rcpp::traits::input_parameter< const double >::type gamma(gammaSEXP);
+    Rcpp::traits::input_parameter< const double >::type epsilon_c(epsilon_cSEXP);
+    Rcpp::traits::input_parameter< const double >::type epsilon_t(epsilon_tSEXP);
+    Rcpp::traits::input_parameter< const int >::type iteMax(iteMaxSEXP);
+    Rcpp::traits::input_parameter< int >::type nfolds(nfoldsSEXP);
+    Rcpp::traits::input_parameter< const bool >::type intercept(interceptSEXP);
+    Rcpp::traits::input_parameter< const bool >::type itcpIncluded(itcpIncludedSEXP);
+    Rcpp::traits::input_parameter< const double >::type tfConst(tfConstSEXP);
+    rcpp_result_gen = Rcpp::wrap(tfNcvxHuberReg(X, Y, lSeq, nlambda, penalty, phi0, gamma, epsilon_c, epsilon_t, iteMax, nfolds, intercept, itcpIncluded, tfConst));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_ILAMM_ncvxReg", (DL_FUNC) &_ILAMM_ncvxReg, 11},
-    {"_ILAMM_ncvxHuberReg", (DL_FUNC) &_ILAMM_ncvxHuberReg, 14},
+    {"_ILAMM_ncvxHuberReg", (DL_FUNC) &_ILAMM_ncvxHuberReg, 12},
     {"_ILAMM_cvNcvxReg", (DL_FUNC) &_ILAMM_cvNcvxReg, 13},
-    {"_ILAMM_cvNcvxHuberReg", (DL_FUNC) &_ILAMM_cvNcvxHuberReg, 17},
+    {"_ILAMM_cvNcvxHuberReg", (DL_FUNC) &_ILAMM_cvNcvxHuberReg, 15},
+    {"_ILAMM_tfNcvxHuberReg", (DL_FUNC) &_ILAMM_tfNcvxHuberReg, 14},
     {NULL, NULL, 0}
 };
 
