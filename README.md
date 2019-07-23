@@ -50,7 +50,7 @@ There are five functions, all of which are implemented by I-LAMM algorithm.
 
 ## Examples 
 
-Here we generate data from a sparse linear model Y = X * beta + epsilon, where beta is sparse and epsilon consists of indepedent coordinates from a log-normal distribution, which is asymmetric and heavy-tailed. 
+Here we generate data from a sparse linear model Y = X &beta; + &epsilon;, where &beta; is sparse and &epsilon; consists of indepedent coordinates from a log-normal distribution, which is asymmetric and heavy-tailed. 
 
 ```{r}
 library(ILAMM)
@@ -69,7 +69,7 @@ fitLasso = cvNcvxReg(X, Y, penalty = "Lasso")
 betaLasso = fitLasso$beta
 ```
 
-Then we apply linear regression with non-convex penalties to fit (Y, X): SCAD and MCP. We can find advantages of SCAD and MCP over Lasso, since non-convex penalties reduce the biasedness introduced by l1 penalty.
+Then we apply linear regression with non-convex penalties to fit (Y, X): SCAD and MCP. We can find advantages of SCAD and MCP over Lasso, since non-convex penalties reduce the biasedness introduced by l<sub>1</sub> penalty.
 
 ```{r}
 fitSCAD = cvNcvxReg(X, Y, penalty = "SCAD")
@@ -87,7 +87,7 @@ fitHuberMCP = cvNcvxHuberReg(X, Y, penalty = "MCP")
 betaHuberMCP = fitHuberMCP$beta
 ```
 
-Finally, we demonstrate non-convex regularized Huber regression with tau calibrated via a tuning-free principle. This function is computationally more efficient, as we decrease cross-validation from two-dimensional grid search to one-dimension. See the reference paper (Wang et al., 2018) for more details of the tuning-free procedure.
+Finally, we demonstrate non-convex regularized Huber regression with &tau; calibrated via a tuning-free principle. This function is computationally more efficient, as we decrease cross-validation from two-dimensional grid search to one-dimension. More details of the tuning-free procedure can be found in [Wang et al., 2018](https://www.math.ucsd.edu/~wez243/Tuning_Free.pdf)
 
 ```{r}
 fitHuberSCAD.tf = tfNcvxHuberReg(X, Y, penalty = "SCAD")
