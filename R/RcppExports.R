@@ -63,6 +63,8 @@ ncvxReg <- function(X, Y, lambda = -1, penalty = "SCAD", phi0 = 0.001, gamma = 1
 #' @param iteMax The maximal number of iteration in either contraction or tightening stage, if this number is reached, the convergence of I-LAMM is failed. The defalut value is 500.
 #' @param intercept Boolean value indicating whether an intercept term should be included into the model. The default setting is \code{FALSE}.
 #' @param itcpIncluded Boolean value indicating whether a column of 1's has been included in the design matrix \eqn{X}. The default setting is \code{FALSE}.
+#' @param tf Boolean value indicating whether a tuning-free principle is applied to calibrate the value of \code{tau}. The default setting is \code{FALSE}.
+#' @param constTau The constant used in tuning-free procedure to update \code{tau}. The default value is 2.
 #' @return A list including the following terms will be returned:
 #' \itemize{
 #' \item \code{beta} The estimated \eqn{\beta}, a vector with length d + 1, with the first one being the value of intercept (0 if \code{intercept = FALSE}).
@@ -164,6 +166,8 @@ cvNcvxReg <- function(X, Y, lSeq = NULL, nlambda = 30L, penalty = "SCAD", phi0 =
 #' @param nfolds The number of folds to conduct cross validation, values that are greater than 10 are not recommended, and it'll be modified to 10 if the input is greater than 10. The default value is 3.
 #' @param intercept Boolean value indicating whether an intercept term should be included into the model. The default setting is \code{FALSE}.
 #' @param itcpIncluded Boolean value indicating whether a column of 1's has been included in the design matrix \eqn{X}. The default setting is \code{FALSE}.
+#' @param tf Boolean value indicating whether a tuning-free principle is applied to calibrate the value of \code{tau}. The default setting is \code{FALSE}.
+#' @param constTau The constant used in tuning-free procedure to update \code{tau}. The default value is 2.
 #' @return A list including the following terms will be returned:
 #' \itemize{
 #' \item \code{beta} The estimated \eqn{\beta} with \eqn{\lambda} and \eqn{\tau} determined by cross validation, it's a vector with length d + 1, with the first one being the value of intercept (0 if \code{intercept = FALSE}).

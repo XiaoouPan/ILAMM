@@ -33,6 +33,10 @@ ncvxHuberReg(X, Y, lambda = -1, penalty = "SCAD", tau = -1,
 \item{intercept}{Boolean value indicating whether an intercept term should be included into the model. The default setting is \code{FALSE}.}
 
 \item{itcpIncluded}{Boolean value indicating whether a column of 1's has been included in the design matrix \eqn{X}. The default setting is \code{FALSE}.}
+
+\item{tf}{Boolean value indicating whether a tuning-free principle is applied to calibrate the value of \code{tau}. The default setting is \code{FALSE}.}
+
+\item{constTau}{The constant used in tuning-free procedure to update \code{tau}. The default value is 2.}
 }
 \value{
 A list including the following terms will be returned:
