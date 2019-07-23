@@ -96,7 +96,7 @@ fitHuberMCP.tf = tfNcvxHuberReg(X, Y, penalty = "MCP")
 betaHuberMCP.tf = fitHuberMCP$beta
 ```
 
-We summarize the performance of the above methods with a table including true positive (TP), false positive (FP), true positive rate (TPR), false positive rate (FPR), l<sub>1</sub> error and l<sub>2</sub> error below. 
+We summarize the performance of the above methods with a table including true positive (TP), false positive (FP), true positive rate (TPR), false positive rate (FPR), l<sub>1</sub> error and l<sub>2</sub> error below. These results are reproducible.
 
 | Method | TP | FP | TPR | FPR | l<sub>1</sub> error | l<sub>2</sub> error |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
