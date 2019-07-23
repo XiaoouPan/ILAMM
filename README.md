@@ -52,7 +52,7 @@ There are five functions, all of which are implemented by I-LAMM algorithm.
 
 Here we generate data from a sparse linear model Y = X &beta; + &epsilon;, where &beta; is sparse and &epsilon; consists of indepedent coordinates from a log-normal distribution, which is asymmetric and heavy-tailed. 
 
-```{r}
+```r
 library(ILAMM)
 n = 50
 d = 100
@@ -64,14 +64,14 @@ Y = X %*% beta + rlnorm(n, 0, 1.2) - exp(1.2^2 / 2)
 
 Fist, we apply Lasso to fit (Y, X) as a benchmark method. It can be found that Lasso overfits the data, which means the estimated signal it produces has high false positive.
 
-```{r}
+```r
 fitLasso = cvNcvxReg(X, Y, penalty = "Lasso")
 betaLasso = fitLasso$beta
 ```
 
 Then we apply linear regression with non-convex penalties to fit (Y, X): SCAD and MCP. We can find advantages of SCAD and MCP over Lasso, since non-convex penalties reduce the biasedness introduced by l<sub>1</sub> penalty.
 
-```{r}
+```r
 fitSCAD = cvNcvxReg(X, Y, penalty = "SCAD")
 betaSCAD = fitSCAD$beta
 fitMCP = cvNcvxReg(X, Y, penalty = "MCP")
@@ -80,7 +80,7 @@ betaMCP = fitMCP$beta
 
 We further apply Huber regression with non-convex penalties to fit (Y, X): Huber-SCAD and Huber-MCP. With heavy-tailed sampling, we can see evident advantages of Huber-SCAD and Huber-MCP over their least squares counterparts, SCAD and MCP.
 
-```{r}
+```r
 fitHuberSCAD = cvNcvxHuberReg(X, Y, penalty = "SCAD")
 betaHuberSCAD = fitHuberSCAD$beta
 fitHuberMCP = cvNcvxHuberReg(X, Y, penalty = "MCP")
@@ -89,12 +89,25 @@ betaHuberMCP = fitHuberMCP$beta
 
 Finally, we demonstrate non-convex regularized Huber regression with &tau; calibrated via a tuning-free principle. This function is computationally more efficient, as we decrease cross-validation from two-dimensional grid search to one-dimension. More details of the tuning-free procedure can be found in [Wang et al., 2018](https://www.math.ucsd.edu/~wez243/Tuning_Free.pdf).
 
-```{r}
+```r
 fitHuberSCAD.tf = tfNcvxHuberReg(X, Y, penalty = "SCAD")
 betaHuberSCAD.tf = fitHuberSCAD$beta
 fitHuberMCP.tf = tfNcvxHuberReg(X, Y, penalty = "MCP")
 betaHuberMCP.tf = fitHuberMCP$beta
 ```
+
+We summarize the performance of the above methods with a table including true positive (TP), false positive (FP), true positive rate (TPR), false positive rate (FPR), l<sub>1</sub> error and l<sub>2</sub> error below. 
+
+| Method | TP | FP | TPR | FPR | l<sub>1</sub> error | l<sub>2</sub> error |
+| Lasso | 3 | 17 | 1 | 0.175 | 5.014 | 1.356 |
+| SCAD | 3 | 3 | 1 | 0.031 | 1.219 | 0.741 |
+| MCP | 3 | 0 | 1 | 0 | 1.156 | 0.795 |
+| Huber-SCAD | 3 | 1 | 1 | 0.010 | 0.710 | 0.402 |
+| Huber-MCP | 3 | 0 | 1 | 0 | 0.611 | 0.354 |
+| TF-Huber-SCAD | 3 | 1 | 1 | 0.010 | 0.710 | 0.402 |
+| TF-Huber-MCP | 3 | 0 | 1 | 0 | 0.611 | 0.354 |
+
+To get more comprehensive results, users can repeat the above simulation for 200 times on dataset with larger scale and take average over the summary statistics.
 
 ## Notes 
 
@@ -114,19 +127,19 @@ Eddelbuettel, D. and Francois, R. (2011). Rcpp: Seamless R and C++ Integration. 
 
 Eddelbuettel, D. and Sanderson, C. (2014). RcppArmadillo: Accelerating R with high-performance C++ linear algebra. Comp. Stat. Dat. Ana. 71 1054-1063. [Paper](http://dirk.eddelbuettel.com/papers/RcppArmadillo.pdf)
 
-Fan, J. and Li, R. (2001). Variable selection via nonconcave penalized likelihood and its oracle properties. J. Amer. Statist. Assoc. 96 1348–1360. [Paper](https://www.tandfonline.com/doi/abs/10.1198/016214501753382273)
+Fan, J. and Li, R. (2001). Variable selection via nonconcave penalized likelihood and its oracle properties. J. Amer. Statist. Assoc. 96 1348-1360. [Paper](https://www.tandfonline.com/doi/abs/10.1198/016214501753382273)
 
 Fan, J., Li, Q. and Wang, Y. (2017). Estimation of high dimensional mean regression in the absence of symmetry and light tail assumptions. J. R. Stat. Soc. Ser. B. Stat. Methodol. 79 247-265. [Paper](https://rss.onlinelibrary.wiley.com/doi/pdf/10.1111/rssb.12166)
 
-Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814–841. [Paper](https://projecteuclid.org/euclid.aos/1522742437)
+Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simultaneous control of algorithmic complexity and statistical error. Ann. Statist. 46 814-841. [Paper](https://projecteuclid.org/euclid.aos/1522742437)
 
-Huber, P. J. (1964). Robust estimation of a location parameter. Ann. Math. Statist. 35 73–101. [Paper](https://projecteuclid.org/euclid.aoms/1177703732)
+Huber, P. J. (1964). Robust estimation of a location parameter. Ann. Math. Statist. 35 73-101. [Paper](https://projecteuclid.org/euclid.aoms/1177703732)
 
 Pan, X., Sun, Q. and Zhou, W.-X. (2019). Nonconvex regularized robust regression with oracle properties in polynomial time. Preprint. [Paper](https://arxiv.org/abs/1907.04027).
 
 Sanderson, C. and Curtin, R. (2016). Armadillo: a template-based C++ library for linear algebra. J. Open. Src. Softw. 1 26. [Paper](http://conradsanderson.id.au/pdfs/sanderson_armadillo_joss_2016.pdf)
 
-Sun, Q., Zhou, W.-X. and Fan, J. (2018) Adaptive Huber regression, J. Amer. Statist. Assoc, to appear. [Paper](https://www.tandfonline.com/doi/abs/10.1080/01621459.2018.1543124)
+Sun, Q., Zhou, W.-X. and Fan, J. (2019) Adaptive Huber regression, J. Amer. Statist. Assoc. 0 1-12. [Paper](https://www.tandfonline.com/doi/abs/10.1080/01621459.2018.1543124)
 
 Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. J. R. Stat. Soc. Ser. B. Stat. Methodol. 58 267–288. [Paper](https://www.jstor.org/stable/2346178?seq=1#metadata_info_tab_contents)
 
