@@ -4,7 +4,7 @@ Nonconvex Regularized Robust Regression via I-LAMM (**I**terative **L**ocal **A*
 
 ## Description
 
-This package employs the I-LAMM algorithm to solve regularized Huber regression. The choice of penalty functions includes the l1-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP). Two tuning parameters lambda and tau (for Huber loss) are calibrated by cross-validation. As a by-product, this package also produces regularized least squares estimators, including the Lasso, SCAD and MCP. See the reference papers for more details. 
+This package employs the I-LAMM algorithm to solve regularized Huber regression. The choice of penalty functions includes the l<sub>1;</sub>-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP). Two tuning parameters lambda and tau (for Huber loss) are calibrated by cross-validation. As a by-product, this package also produces regularized least squares estimators, including the Lasso, SCAD and MCP. See the reference papers for more details. 
 
 Assume that the observed data (Y, X) follow a linear model Y = X * beta + epsilon, where Y is an n-dimensional response vector, X is an n by d design matrix, beta is a sparse vector and epsilon is an n-vector of noise variables whose distributions can be asymmetric and/or heavy-tailed. The package will compute the regularized Huber regression estimator.
 
@@ -33,9 +33,9 @@ The package `ILAMM` is implemented in `Rcpp` and `RcppArmadillo`, so the followi
 
 * Error: "library not found for -lgfortran/-lquadmath": It means your gfortran binaries are out of date. This is a common environment specific issue. 
 
-    1. In R 3.0.0 - R 3.3.0: Upgrading to R 3.4 is strongly recommended. Then go to the next step. Alternatively, you can try the instructions here: [link](http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/).
+    1. In R 3.0.0 - R 3.3.0: Upgrading to R 3.4 is strongly recommended. Then go to the next step. Alternatively, you can try the instructions [here](http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/).
 
-    2. For >= R 3.4.* : download the installer from the here: [link](https://gcc.gnu.org/wiki/GFortranBinaries#MacOS). Then run the installer.
+    2. For >= R 3.4.* : download the installer from [here](https://gcc.gnu.org/wiki/GFortranBinaries#MacOS). Then run the installer.
 
 
 ## Functions
@@ -122,7 +122,7 @@ Fan, J., Liu, H., Sun, Q. and Zhang, T. (2018). I-LAMM for sparse learning: Simu
 
 Huber, P. J. (1964). Robust estimation of a location parameter. Ann. Math. Statist. 35 73–101. [paper](https://projecteuclid.org/euclid.aoms/1177703732)
 
-Pan, X., Sun, Q. and Zhou, W.-X. (2019). Nonconvex regularized robust regression with oracle properties in polynomial time. Preprint [paper](https://arxiv.org/abs/1907.04027).
+Pan, X., Sun, Q. and Zhou, W.-X. (2019). Nonconvex regularized robust regression with oracle properties in polynomial time. Preprint. [paper](https://arxiv.org/abs/1907.04027).
 
 Sanderson, C. and Curtin, R. (2016). Armadillo: a template-based C++ library for linear algebra. J. Open. Src. Softw. 1 26. [paper](http://conradsanderson.id.au/pdfs/sanderson_armadillo_joss_2016.pdf)
 
