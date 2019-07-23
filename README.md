@@ -1,6 +1,6 @@
 # ILAMM 
 
-Nonconvex Regularized Robust Regression via I-LAMM (iterative local adaptive majorize-minimization) Algorithm
+Nonconvex Regularized Robust Regression via I-LAMM (**I**terative **L**ocal **A**daptive **M**ajorize-**M**inimization) Algorithm
 
 ## Description
 
