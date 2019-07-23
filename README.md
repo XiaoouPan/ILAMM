@@ -99,7 +99,7 @@ betaHuberMCP.tf = fitHuberMCP$beta
 We summarize the performance of the above methods with a table including true positive (TP), false positive (FP), true positive rate (TPR), false positive rate (FPR), l<sub>1</sub> error and l<sub>2</sub> error below. 
 
 | Method | TP | FP | TPR | FPR | l<sub>1</sub> error | l<sub>2</sub> error |
-| ------ | -- | -- | --- | --- | ------------------- | ------------------- |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | Lasso | 3 | 17 | 1 | 0.175 | 5.014 | 1.356 |
 | SCAD | 3 | 3 | 1 | 0.031 | 1.219 | 0.741 |
 | MCP | 3 | 0 | 1 | 0 | 1.156 | 0.795 |
