@@ -62,19 +62,38 @@ beta = c(rep(2, 3), rep(0, d - 3))
 Y = X %*% beta + rlnorm(n, 0, 1.2) - exp(1.2^2 / 2)
 ```
 
-We apply five methods to fit (Y, X): Lasso, SCAD, Huber-SCAD, MCP and Huber-MCP. With heavy-tailed sampling, we can see evident advantages of Huber-SCAD and Huber-MCP over their least squares counterparts, SCAD and MCP.
+Fist, we apply Lasso to fit (Y, X) as a benchmark method. It can be found that Lasso overfits the data, which means the estimated signal it produces has high false positive.
 
 ```{r}
 fitLasso = cvNcvxReg(X, Y, penalty = "Lasso")
 betaLasso = fitLasso$beta
+```
+
+Then we apply linear regression with non-convex penalties to fit (Y, X): SCAD and MCP. We can find advantages of SCAD and MCP over Lasso, since non-convex penalties reduce the biasedness introduced by l1 penalty.
+
+```{r}
 fitSCAD = cvNcvxReg(X, Y, penalty = "SCAD")
 betaSCAD = fitSCAD$beta
-fitHuberSCAD = cvNcvxHuberReg(X, Y, penalty = "SCAD")
-betaHuberSCAD = fitHuberSCAD$beta
 fitMCP = cvNcvxReg(X, Y, penalty = "MCP")
 betaMCP = fitMCP$beta
+```
+
+We further apply Huber regression with non-convex penalties to fit (Y, X): Huber-SCAD and Huber-MCP. With heavy-tailed sampling, we can see evident advantages of Huber-SCAD and Huber-MCP over their least squares counterparts, SCAD and MCP.
+
+```{r}
+fitHuberSCAD = cvNcvxHuberReg(X, Y, penalty = "SCAD")
+betaHuberSCAD = fitHuberSCAD$beta
 fitHuberMCP = cvNcvxHuberReg(X, Y, penalty = "MCP")
 betaHuberMCP = fitHuberMCP$beta
+```
+
+Finally, we demonstrate non-convex regularized Huber regression with tau calibrated via a tuning-free principle. This function is computationally more efficient, as we decrease cross-validation from two-dimensional grid search to one-dimension. See the reference paper (Wang et al., 2018) for more details of the tuning-free procedure.
+
+```{r}
+fitHuberSCAD.tf = tfNcvxHuberReg(X, Y, penalty = "SCAD")
+betaHuberSCAD.tf = fitHuberSCAD$beta
+fitHuberMCP.tf = tfNcvxHuberReg(X, Y, penalty = "MCP")
+betaHuberMCP.tf = fitHuberMCP$beta
 ```
 
 ## Notes 
