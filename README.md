@@ -8,7 +8,7 @@ This package employs the I-LAMM algorithm to solve regularized Huber regression.
 
 Assume that the observed data (Y, X) follow a linear model Y = X &beta; + &epsilon;, where Y is an n-dimensional response vector, X is an n by d design matrix, &beta; is a sparse vector and &epsilon; is an n-vector of noise variables whose distributions can be asymmetric and/or heavy-tailed. The package will compute the regularized Huber regression estimator.
 
-With this package, numerical simulation of Section 5 from [this paper](https://arxiv.org/abs/1907.04027) can be reporduced.
+With this package, the simulation results in Section 5 of [this paper](https://arxiv.org/abs/1907.04027) can be reporduced.
 
 ## Installation
 
