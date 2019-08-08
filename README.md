@@ -114,7 +114,7 @@ To get more comprehensive results, users can repeat the above simulation for 200
 
 ## Notes 
 
-Function `cvNcvxHuberReg` is slower than the others because it carries out a two-dimensional grid search to choose both %lambda; and %tau; via cross-validation.
+Function `cvNcvxHuberReg` is slower than the others because it carries out a two-dimensional grid search to choose both lambda and tau via cross-validation.
 
 ## License
 
