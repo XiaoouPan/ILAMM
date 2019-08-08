@@ -6,7 +6,7 @@ Nonconvex Regularized Robust Regression via I-LAMM (**I**terative **L**ocal **A*
 
 This package employs the I-LAMM algorithm to solve regularized Huber regression. The choice of penalty functions includes the l<sub>1</sub>-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP). Tuning parameter &lambda; is chosen by cross-validation, and &tau; (for Huber loss) is calibrated either by cross-validation or via a tuning-free principle. As a by-product, this package also produces regularized least squares estimators, including the Lasso, SCAD and MCP. 
 
-Assume that the observed data (Y, X) follow a linear model &Y; = &X; &beta; + &epsilon;, where Y is an n-dimensional response vector, X is an n by d design matrix, &beta; is a sparse vector and &epsilon; is an n-vector of noise variables whose distributions can be asymmetric and/or heavy-tailed. The package will compute the regularized Huber regression estimator.
+Assume that the observed data (Y, X) follow a linear model Y = X &beta; + &epsilon;, where Y is an n-dimensional response vector, X is an n by d design matrix, &beta; is a sparse vector and &epsilon; is an n-vector of noise variables whose distributions can be asymmetric and/or heavy-tailed. The package will compute the regularized Huber regression estimator.
 
 With this package, the simulation results in Section 5 of [this paper](https://arxiv.org/abs/1907.04027) can be reporduced.
 
@@ -42,7 +42,7 @@ The package `ILAMM` is implemented in `Rcpp` and `RcppArmadillo`, so the followi
 
 ## Functions
 
-There are five functions, all of which are implemented by I-LAMM algorithm. 
+There are five functions, all of which are implementing the I-LAMM algorithm. 
 
 * `ncvxReg`: Nonconvex regularized regression (Lasso, SCAD, MCP). 
 * `ncvxHuberReg`: Nonconvex regularized Huber regression (Huber-Lasso, Huber-SCAD, Huber-MCP).
@@ -114,7 +114,7 @@ To get more comprehensive results, users can repeat the above simulation for 200
 
 ## Notes 
 
-Function `cvNcvxHuberReg` might be slow, because it carries out a two-dimensional grid search to choose lambda and tau using cross-validation.
+Function `cvNcvxHuberReg` is slower than the others because it carries out a two-dimensional grid search to choose both %lambda; and %tau; via cross-validation.
 
 ## License
 
