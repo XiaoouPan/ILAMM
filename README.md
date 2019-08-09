@@ -93,9 +93,9 @@ Finally, we demonstrate non-convex regularized Huber regression with &tau; calib
 
 ```r
 fitHuberSCAD.tf = tfNcvxHuberReg(X, Y, penalty = "SCAD")
-betaHuberSCAD.tf = fitHuberSCAD$beta
+betaHuberSCAD.tf = fitHuberSCAD.tf$beta
 fitHuberMCP.tf = tfNcvxHuberReg(X, Y, penalty = "MCP")
-betaHuberMCP.tf = fitHuberMCP$beta
+betaHuberMCP.tf = fitHuberMCP.tf$beta
 ```
 
 We summarize the performance of the above methods with a table including true positive (TP), false positive (FP), true positive rate (TPR), false positive rate (FPR), l<sub>1</sub> error and l<sub>2</sub> error below. These results can easily be reproduced.
