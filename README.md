@@ -42,7 +42,7 @@ The package `ILAMM` is implemented in `Rcpp` and `RcppArmadillo`, so the followi
 
 ## Functions
 
-There are five functions, all of which are implementing the I-LAMM algorithm. 
+There are five functions, all of which are based on the I-LAMM algorithm. 
 
 * `ncvxReg`: Nonconvex regularized regression (Lasso, SCAD, MCP). 
 * `ncvxHuberReg`: Nonconvex regularized Huber regression (Huber-Lasso, Huber-SCAD, Huber-MCP).
@@ -64,14 +64,14 @@ beta = c(rep(2, 3), rep(0, d - 3))
 Y = X %*% beta + rlnorm(n, 0, 1.2) - exp(1.2^2 / 2)
 ```
 
-Fist, we apply Lasso to fit (Y, X) as a benchmark method. It can be found that Lasso overfits the data, which means the estimated signal it produces has high false positive.
+First, we apply the Lasso to fit a linear model on (Y, X) as a benchmark. It can be seen that the cross-valided Lasso produces an overfitted model with many false positives.
 
 ```r
 fitLasso = cvNcvxReg(X, Y, penalty = "Lasso")
 betaLasso = fitLasso$beta
 ```
 
-Then we apply linear regression with non-convex penalties to fit (Y, X): SCAD and MCP. We can find advantages of SCAD and MCP over Lasso, since non-convex penalties reduce the biasedness introduced by l<sub>1</sub> penalty.
+Next, we apply two non-convex regularized least squares methods, SCAD and MCP, to the data. Non-convex penalties reduce the bias introduced by the l<sub>1</sub> penalty.
 
 ```r
 fitSCAD = cvNcvxReg(X, Y, penalty = "SCAD")
@@ -89,16 +89,16 @@ fitHuberMCP = cvNcvxHuberReg(X, Y, penalty = "MCP")
 betaHuberMCP = fitHuberMCP$beta
 ```
 
-Finally, we demonstrate non-convex regularized Huber regression with &tau; calibrated via a tuning-free principle. This function is computationally more efficient, as we decrease cross-validation from two-dimensional grid search to one-dimension. More details of the tuning-free procedure can be found in [Wang et al., 2018](https://www.math.ucsd.edu/~wez243/Tuning_Free.pdf).
+Finally, we demonstrate non-convex regularized Huber regression with &tau; calibrated via a tuning-free procedure. This function is computationally more efficient, because the cross-validation is only applied to choose the regularization parameter. More details of the tuning-free procedure can be found in [Wang et al., 2018](https://www.math.ucsd.edu/~wez243/Tuning_Free.pdf).
 
 ```r
 fitHuberSCAD.tf = tfNcvxHuberReg(X, Y, penalty = "SCAD")
-betaHuberSCAD.tf = fitHuberSCAD$beta
+betaHuberSCAD.tf = fitHuberSCAD.tf$beta
 fitHuberMCP.tf = tfNcvxHuberReg(X, Y, penalty = "MCP")
-betaHuberMCP.tf = fitHuberMCP$beta
+betaHuberMCP.tf = fitHuberMCP.tf$beta
 ```
 
-We summarize the performance of the above methods with a table including true positive (TP), false positive (FP), true positive rate (TPR), false positive rate (FPR), l<sub>1</sub> error and l<sub>2</sub> error below. These results are reproducible.
+We summarize the performance of the above methods with a table including true positive (TP), false positive (FP), true positive rate (TPR), false positive rate (FPR), l<sub>1</sub> error and l<sub>2</sub> error below. These results can easily be reproduced.
 
 | Method | TP | FP | TPR | FPR | l<sub>1</sub> error | l<sub>2</sub> error |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -110,7 +110,7 @@ We summarize the performance of the above methods with a table including true po
 | TF-Huber-SCAD | 3 | 1 | 1 | 0.010 | 0.710 | 0.402 |
 | TF-Huber-MCP | 3 | 0 | 1 | 0 | 0.611 | 0.354 |
 
-To get more comprehensive results, users can repeat the above simulation for 200 times on dataset with larger scale and take average over the summary statistics.
+To obtain more reliable results, users can run the above simulation repeatedly on datasets with larger scales and take average over the summary statistics.
 
 ## Notes 
 
