@@ -4,9 +4,9 @@ Nonconvex Regularized Robust Regression via I-LAMM (**I**terative **L**ocal **A*
 
 ## Description
 
-This package employs the I-LAMM algorithm to solve regularized Huber regression. The choice of penalty functions includes the l<sub>1</sub>-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP). Tuning parameter &lambda; is chosen by cross-validation, and &tau; (for Huber loss) is calibrated either by cross-validation or via a tuning-free principle. As a by-product, this package also produces regularized least squares estimators, including the Lasso, SCAD and MCP. 
+This package employs the I-LAMM algorithm to solve regularized Huber regression. The choice of penalty functions includes the *l<sub>1</sub>*-norm, the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP). Tuning parameter *&lambda;* is chosen by cross-validation, and *&tau;* (for Huber loss) is calibrated either by cross-validation or via a tuning-free principle. As a by-product, this package also produces regularized least squares estimators, including the Lasso, SCAD and MCP. 
 
-Assume that the observed data (&Y;, &X;) follow a linear model Y = X &beta; + &epsilon;, where Y is an n-dimensional response vector, X is an n by d design matrix, &beta; is a sparse vector and &epsilon; is an n-vector of noise variables whose distributions can be asymmetric and/or heavy-tailed. The package will compute the regularized Huber regression estimator.
+Assume that the observed data (*Y*, *X*) follow a linear model *Y = X &beta; + &epsilon;*, where *Y* is an *n*-dimensional response vector, *X* is an *n* &times; *d* design matrix, *&beta;* is a sparse vector and *&epsilon;* is an *n*-vector of noise variables whose distributions can be asymmetric and/or heavy-tailed. The package will compute the regularized Huber regression estimator.
 
 With this package, the simulation results in Section 5 of [this paper](https://arxiv.org/abs/1907.04027) can be reporduced.
 
@@ -46,13 +46,13 @@ There are five functions, all of which are based on the I-LAMM algorithm.
 
 * `ncvxReg`: Nonconvex regularized regression (Lasso, SCAD, MCP). 
 * `ncvxHuberReg`: Nonconvex regularized Huber regression (Huber-Lasso, Huber-SCAD, Huber-MCP).
-* `cvNcvxReg`: K-fold cross-validation for nonconvex regularized regression.
-* `cvNcvxHuberReg`: K-fold cross-validation for nonconvex regularized Huber regression.
+* `cvNcvxReg`: *K*-fold cross-validation for nonconvex regularized regression.
+* `cvNcvxHuberReg`: *K*-fold cross-validation for nonconvex regularized Huber regression.
 * `tfNcvxHuberReg`: Tuning-free nonconvex regularized Huber regression.
 
 ## Examples 
 
-Here we generate data from a sparse linear model Y = X &beta; + &epsilon;, where &beta; is sparse and &epsilon; consists of indepedent coordinates from a log-normal distribution, which is asymmetric and heavy-tailed. 
+Here we generate data from a sparse linear model *Y = X &beta; + &epsilon;*, where *&beta;* is sparse and *&epsilon;* consists of indepedent coordinates from a log-normal distribution, which is asymmetric and heavy-tailed. 
 
 ```r
 library(ILAMM)
@@ -64,14 +64,14 @@ beta = c(rep(2, 3), rep(0, d - 3))
 Y = X %*% beta + rlnorm(n, 0, 1.2) - exp(1.2^2 / 2)
 ```
 
-First, we apply the Lasso to fit a linear model on (Y, X) as a benchmark. It can be seen that the cross-valided Lasso produces an overfitted model with many false positives.
+First, we apply the Lasso to fit a linear model on (*Y*, *X*) as a benchmark. It can be seen that the cross-valided Lasso produces an overfitted model with many false positives.
 
 ```r
 fitLasso = cvNcvxReg(X, Y, penalty = "Lasso")
 betaLasso = fitLasso$beta
 ```
 
-Next, we apply two non-convex regularized least squares methods, SCAD and MCP, to the data. Non-convex penalties reduce the bias introduced by the l<sub>1</sub> penalty.
+Next, we apply two non-convex regularized least squares methods, SCAD and MCP, to the data. Non-convex penalties reduce the bias introduced by the *l<sub>1</sub>* penalty.
 
 ```r
 fitSCAD = cvNcvxReg(X, Y, penalty = "SCAD")
@@ -80,7 +80,7 @@ fitMCP = cvNcvxReg(X, Y, penalty = "MCP")
 betaMCP = fitMCP$beta
 ```
 
-We further apply Huber regression with non-convex penalties to fit (Y, X): Huber-SCAD and Huber-MCP. With heavy-tailed sampling, we can see evident advantages of Huber-SCAD and Huber-MCP over their least squares counterparts, SCAD and MCP.
+We further apply Huber regression with non-convex penalties to fit (*Y*, *X*): Huber-SCAD and Huber-MCP. With heavy-tailed sampling, we can see evident advantages of Huber-SCAD and Huber-MCP over their least squares counterparts, SCAD and MCP.
 
 ```r
 fitHuberSCAD = cvNcvxHuberReg(X, Y, penalty = "SCAD")
@@ -89,7 +89,7 @@ fitHuberMCP = cvNcvxHuberReg(X, Y, penalty = "MCP")
 betaHuberMCP = fitHuberMCP$beta
 ```
 
-Finally, we demonstrate non-convex regularized Huber regression with &tau; calibrated via a tuning-free procedure. This function is computationally more efficient, because the cross-validation is only applied to choose the regularization parameter. More details of the tuning-free procedure can be found in [Wang et al., 2018](https://www.math.ucsd.edu/~wez243/Tuning_Free.pdf).
+Finally, we demonstrate non-convex regularized Huber regression with *&tau;* calibrated via a tuning-free procedure. This function is computationally more efficient, because the cross-validation is only applied to choosing the regularization parameter. More details of the tuning-free procedure can be found in [Wang et al., 2018](https://www.math.ucsd.edu/~wez243/Tuning_Free.pdf).
 
 ```r
 fitHuberSCAD.tf = tfNcvxHuberReg(X, Y, penalty = "SCAD")
@@ -98,7 +98,7 @@ fitHuberMCP.tf = tfNcvxHuberReg(X, Y, penalty = "MCP")
 betaHuberMCP.tf = fitHuberMCP.tf$beta
 ```
 
-We summarize the performance of the above methods with a table including true positive (TP), false positive (FP), true positive rate (TPR), false positive rate (FPR), l<sub>1</sub> error and l<sub>2</sub> error below. These results can easily be reproduced.
+We summarize the performance of the above methods with a table including true positive (TP), false positive (FP), true positive rate (TPR), false positive rate (FPR), *l<sub>1</sub>* error and *l<sub>2</sub>* error below. These results can easily be reproduced.
 
 | Method | TP | FP | TPR | FPR | l<sub>1</sub> error | l<sub>2</sub> error |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -114,7 +114,7 @@ To obtain more reliable results, users can run the above simulation repeatedly o
 
 ## Notes 
 
-Function `cvNcvxHuberReg` is slower than the others because it carries out a two-dimensional grid search to choose both lambda and tau via cross-validation.
+Function `cvNcvxHuberReg` is slower than the others because it carries out a two-dimensional grid search to choose both *&lambda;* and *&tau;* via cross-validation.
 
 ## License
 
@@ -126,7 +126,7 @@ Xiaoou Pan <xip024@ucsd.edu>, Qiang Sun <qsun@utstat.toronto.edu>, Wen-Xin Zhou 
 
 ## Reference
 
-Eddelbuettel, D. and Francois, R. (2011). Rcpp: Seamless R and C++ Integration. J. Stat. Softw. 40(8) 1-18. [Paper](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf)
+Eddelbuettel, D. and Francois, R. (2011). Rcpp: Seamless R and C++ integration. J. Stat. Softw. 40(8) 1-18. [Paper](http://dirk.eddelbuettel.com/code/rcpp/Rcpp-introduction.pdf)
 
 Eddelbuettel, D. and Sanderson, C. (2014). RcppArmadillo: Accelerating R with high-performance C++ linear algebra. Comput. Statist. Data Anal. 71 1054-1063. [Paper](http://dirk.eddelbuettel.com/papers/RcppArmadillo.pdf)
 
@@ -140,7 +140,7 @@ Huber, P. J. (1964). Robust estimation of a location parameter. Ann. Math. Stati
 
 Pan, X., Sun, Q. and Zhou, W.-X. (2019). Nonconvex regularized robust regression with oracle properties in polynomial time. Preprint. [Paper](https://arxiv.org/abs/1907.04027).
 
-Sanderson, C. and Curtin, R. (2016). Armadillo: a template-based C++ library for linear algebra. J. Open Source Softw. 1 26. [Paper](http://conradsanderson.id.au/pdfs/sanderson_armadillo_joss_2016.pdf)
+Sanderson, C. and Curtin, R. (2016). Armadillo: A template-based C++ library for linear algebra. J. Open Source Softw. 1 26. [Paper](http://conradsanderson.id.au/pdfs/sanderson_armadillo_joss_2016.pdf)
 
 Sun, Q., Zhou, W.-X. and Fan, J. (2019) Adaptive Huber regression, J. Amer. Statist. Assoc. 0 1-12. [Paper](https://www.tandfonline.com/doi/abs/10.1080/01621459.2018.1543124)
 
