@@ -3,9 +3,7 @@ Type: Package
 Title: Nonconvex Regularized Robust Regression via I-LAMM Algorithm
 Version: 1.0.0
 Author: Xiaoou Pan, Qiang Sun, Wen-Xin Zhou
-Maintainer: Xiaoou Pan <xip024@ucsd.edu>, 
-            Qiang Sun <qsun@utstat.toronto.edu>, 
-            Wen-Xin Zhou <wez243@ucsd.edu>
+Maintainer: Xiaoou Pan <xip024@ucsd.edu>
 Description: A C++ implementation of I-LAMM algorithm to compute regularized Huber regression. 
              The choice of penalty functions includes the l1-norm (Lasso), the smoothly clipped absolute deviation (SCAD) and the minimax concave penalty (MCP).
              Two tuning parameters lambda (for penalty) and tau (for Huber loss) can be either user-specified or calibrated by k-fold cross-validation. 
@@ -13,7 +11,7 @@ Description: A C++ implementation of I-LAMM algorithm to compute regularized Hub
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports: Rcpp (>= 1.0.0), RcppArmadillo
+Imports: Rcpp
 LinkingTo: Rcpp, RcppArmadillo
 Depends: RcppArmadillo
 SystemRequirements: GNU make
