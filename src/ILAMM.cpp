@@ -2,6 +2,7 @@
 # include <cmath>
 # include <string>
 // [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::plugins(cpp11)]]
 
 int sgn(const double x) {
   return (x > 0) - (x < 0);
