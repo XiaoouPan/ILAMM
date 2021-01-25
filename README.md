@@ -120,9 +120,17 @@ Function `cvNcvxHuberReg` is slower than the others because it carries out a two
 
 GPL (>= 2)
 
+##  System requirements 
+
+C++11
+
 ## Authors
 
 Xiaoou Pan <xip024@ucsd.edu>, Qiang Sun <qsun@utstat.toronto.edu>, Wen-Xin Zhou <wez243@ucsd.edu> 
+
+## Maintainer
+
+Xiaoou Pan <xip024@ucsd.edu>
 
 ## Reference
 
