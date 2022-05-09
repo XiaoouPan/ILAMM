@@ -10,6 +10,10 @@ Assume that the observed data (*Y*, *X*) follow a linear model *Y = X &beta; + &
 
 With this package, the simulation results in Section 5 of [this paper](https://arxiv.org/abs/1907.04027) can be reporduced.
 
+## Update 2022-05-09
+
+We are wrapping up the package and will submit it to CRAN soon.
+
 ## Installation
 
 Install `ILAMM` from GitHub:
